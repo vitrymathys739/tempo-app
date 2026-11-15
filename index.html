@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Tempo">
     
-    <!-- Lien vers le fichier manifest pour l'installation -->
+    <!-- Lien vers le fichier manifest pour l'installation multi-plateforme -->
     <link rel="manifest" href="manifest.json">
 
     <style>
@@ -24,15 +24,40 @@
             background-color: #f8fafc;
             color: #0f172a;
         }
+        .container {
+            text-align: center;
+        }
         h1 {
             font-size: 2.5rem;
             letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            color: #64748b;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
 
-    <h1>Hello World depuis Tempo (Prêt pour iPhone) !</h1>
+    <div class="container">
+        <h1>Tempo</h1>
+        <p>Application prête pour iOS et Android !</p>
+    </div>
 
+    <!-- Script pour enregistrer le Service Worker (nécessaire pour Android / PWA) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((reg) => {
+                        console.log('Service Worker enregistré avec succès :', reg.scope);
+                    })
+                    .catch((err) => {
+                        console.log('Échec de l\'enregistrement du Service Worker :', err);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
