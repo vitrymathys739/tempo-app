@@ -1,0 +1,15 @@
+{
+  "name": "Tempo - Application de Routine",
+  "short_name": "Tempo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

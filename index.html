@@ -2,10 +2,18 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tempo - Mon App de Routine</title>
+
+    <!-- Balises spécifiques pour iOS (iPhone) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tempo">
+    
+    <!-- Lien vers le fichier manifest pour l'installation -->
+    <link rel="manifest" href="manifest.json">
+
     <style>
-        /* Style minimaliste pour un rendu propre dès le départ */
         body {
             margin: 0;
             height: 100vh;
@@ -24,7 +32,7 @@
 </head>
 <body>
 
-    <h1>Hello World !</h1>
+    <h1>Hello World depuis Tempo (Prêt pour iPhone) !</h1>
 
 </body>
 </html>
