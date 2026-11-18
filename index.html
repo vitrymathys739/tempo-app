@@ -11,6 +11,9 @@
     <meta name="apple-mobile-web-app-title" content="Tempo">
     <link rel="manifest" href="manifest.json">
 
+    <!-- SDK Officiel Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --bg-color: #09090b;
@@ -20,12 +23,13 @@
             --accent: #3b82f6;
             --accent-hover: #2563eb;
             --success: #10b981;
+            --error: #ef4444;
             --border: #27272a;
         }
 
         body {
             margin: 0;
-            padding: 0;
+            padding: 16px;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -33,6 +37,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
         .card-container {
@@ -64,7 +69,6 @@
             margin: 0;
         }
 
-        /* Onglets bascule Connexion / Inscription */
         .auth-tabs {
             display: flex;
             background: var(--bg-color);
@@ -93,7 +97,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Formulaires */
         form {
             display: flex;
             flex-direction: column;
@@ -112,7 +115,9 @@
             color: var(--text-muted);
         }
 
-        input {
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             background: var(--bg-color);
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -127,6 +132,31 @@
             border-color: var(--accent);
         }
 
+        .rgpd-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .rgpd-box input[type="checkbox"] {
+            margin-top: 2px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .error-banner {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--error);
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
         .submit-btn {
             background: var(--accent);
             color: white;
@@ -137,12 +167,17 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background 0.2s;
-            margin-top: 8px;
+            margin-top: 4px;
             width: 100%;
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background: var(--accent-hover);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .logout-btn {
@@ -158,7 +193,6 @@
             background: var(--bg-color);
         }
 
-        /* Écran de succès */
         .success-view {
             text-align: center;
             padding: 16px 0;
@@ -196,6 +230,8 @@
             <button class="tab-btn" id="register-tab" onclick="switchMode('register')">Inscription</button>
         </div>
 
+        <div id="error-message" class="error-banner hidden" style="margin-bottom: 16px;"></div>
+
         <form id="auth-form" onsubmit="handleSubmit(event)">
             <div class="form-group hidden" id="name-group">
                 <label for="name">Nom complet</label>
@@ -208,11 +244,19 @@
             </div>
 
             <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <label for="password">Mot de passe (6 caractères min.)</label>
+                <input type="password" id="password" required minlength="6" placeholder="••••••••">
             </div>
 
-            <button type="submit" class="submit-btn" id="submit-btn-text">Se connecter</button>
+            <!-- Case de consentement RGPD visible uniquement à l'inscription -->
+            <div class="rgpd-box hidden" id="rgpd-group">
+                <input type="checkbox" id="rgpd-consent">
+                <label for="rgpd-consent" style="cursor: pointer;">
+                    J'accepte que mes données soient traitées de manière sécurisée en Europe (UE) conformément au RGPD pour le fonctionnement de mon compte Tempo.
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn">Se connecter</button>
         </form>
     </div>
 
@@ -221,6 +265,7 @@
         <div class="success-icon">✓</div>
         <h1>Connexion Réussie</h1>
         <p id="welcome-user" style="margin-top: 8px;">Bienvenue sur Tempo !</p>
+        <p style="font-size: 0.8rem; margin-top: 12px;">Session sécurisée active</p>
         <button class="submit-btn logout-btn" onclick="logout()">Se déconnecter</button>
     </div>
 
@@ -230,43 +275,126 @@
             navigator.serviceWorker.register('/sw.js');
         }
 
+        const SUPABASE_URL = 'https://kgrgetlhsedhhjgjxonj.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_-mMY5b7LTRwzCE5ny1aMSw_8KEvUMCT';
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let isLoginMode = true;
+
+        // Vérifier automatiquement si l'utilisateur est déjà connecté au chargement
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                showSuccessView(session.user.email);
+            }
+        });
+
         function switchMode(mode) {
             const loginTab = document.getElementById('login-tab');
             const registerTab = document.getElementById('register-tab');
             const nameGroup = document.getElementById('name-group');
-            const submitBtnText = document.getElementById('submit-btn-text');
+            const rgpdGroup = document.getElementById('rgpd-group');
+            const rgpdConsent = document.getElementById('rgpd-consent');
+            const submitBtn = document.getElementById('submit-btn');
             const subtitle = document.getElementById('subtitle');
+            hideError();
 
             if (mode === 'login') {
+                isLoginMode = true;
                 loginTab.classList.add('active');
                 registerTab.classList.remove('active');
                 nameGroup.classList.add('hidden');
-                submitBtnText.textContent = "Se connecter";
+                rgpdGroup.classList.add('hidden');
+                rgpdConsent.required = false;
+                submitBtn.textContent = "Se connecter";
                 subtitle.textContent = "Connecte-toi pour gérer tes routines";
             } else {
+                isLoginMode = false;
                 registerTab.classList.add('active');
                 loginTab.classList.remove('active');
                 nameGroup.classList.remove('hidden');
-                submitBtnText.textContent = "Créer mon compte";
+                rgpdGroup.classList.remove('hidden');
+                rgpdConsent.required = true;
+                submitBtn.textContent = "Créer mon compte";
                 subtitle.textContent = "Crée un compte pour commencer";
             }
         }
 
-        function handleSubmit(event) {
+        async function handleSubmit(event) {
             event.preventDefault();
-            const email = document.getElementById('email').value;
-            
-            // Bascule instantanée vers l'écran "Connexion Réussie"
+            hideError();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('name').value.trim();
+            const submitBtn = document.getElementById('submit-btn');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Chargement...";
+
+            try {
+                if (isLoginMode) {
+                    // Connexion via Supabase
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password,
+                    });
+                    if (error) throw error;
+                    showSuccessView(data.user.email);
+                } else {
+                    // Inscription via Supabase avec métadonnées minimales
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: { full_name: fullName }
+                        }
+                    });
+                    if (error) throw error;
+                    
+                    if (data.session) {
+                        showSuccessView(data.user.email);
+                    } else {
+                        showError("Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.");
+                    }
+                }
+            } catch (error) {
+                showError(traductionErreur(error.message));
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = isLoginMode ? "Se connecter" : "Créer mon compte";
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            document.getElementById('auth-form').reset();
+            document.getElementById('success-view').classList.add('hidden');
+            document.getElementById('auth-view').classList.remove('hidden');
+        }
+
+        function showSuccessView(email) {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('success-view').classList.remove('hidden');
             document.getElementById('welcome-user').textContent = `Connecté avec : ${email}`;
         }
 
-        function logout() {
-            // Retour à l'écran de connexion
-            document.getElementById('auth-form').reset();
-            document.getElementById('success-view').classList.add('hidden');
-            document.getElementById('auth-view').classList.remove('hidden');
+        function showError(msg) {
+            const errDiv = document.getElementById('error-message');
+            errDiv.textContent = msg;
+            errDiv.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error-message').classList.add('hidden');
+        }
+
+        function traductionErreur(message) {
+            if (message.includes("Invalid login credentials")) return "Email ou mot de passe incorrect.";
+            if (message.includes("User already registered")) return "Un compte existe déjà avec cet email.";
+            if (message.includes("Password should be at least")) return "Le mot de passe doit faire au moins 6 caractères.";
+            return "Une erreur est survenue : " + message;
         }
     </script>
 </body>
