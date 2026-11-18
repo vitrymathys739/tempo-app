@@ -19,6 +19,7 @@
             --text-muted: #a1a1aa;
             --accent: #3b82f6;
             --accent-hover: #2563eb;
+            --success: #10b981;
             --border: #27272a;
         }
 
@@ -34,7 +35,7 @@
             min-height: 100vh;
         }
 
-        .auth-container {
+        .card-container {
             width: 100%;
             max-width: 400px;
             padding: 32px;
@@ -137,32 +138,64 @@
             cursor: pointer;
             transition: background 0.2s;
             margin-top: 8px;
+            width: 100%;
         }
 
         .submit-btn:hover {
             background: var(--accent-hover);
         }
 
+        .logout-btn {
+            background: var(--bg-color);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            margin-top: 24px;
+        }
+
+        .logout-btn:hover {
+            color: var(--text-color);
+            border-color: var(--text-muted);
+            background: var(--bg-color);
+        }
+
+        /* Écran de succès */
+        .success-view {
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        .success-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 16px auto;
+        }
+
         .hidden {
-            display: none;
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
+    <!-- VUE 1 : Formulaire de Connexion / Inscription -->
+    <div class="card-container" id="auth-view">
         <div class="logo-area">
             <h1>Tempo</h1>
-            <p id="subtitle">L'appli faite pour toi !</p>
+            <p id="subtitle">Connecte-toi pour gérer tes routines</p>
         </div>
 
-        <!-- Boutons pour basculer -->
         <div class="auth-tabs">
             <button class="tab-btn active" id="login-tab" onclick="switchMode('login')">Connexion</button>
             <button class="tab-btn" id="register-tab" onclick="switchMode('register')">Inscription</button>
         </div>
 
-        <!-- Formulaire unique géré en JS -->
         <form id="auth-form" onsubmit="handleSubmit(event)">
             <div class="form-group hidden" id="name-group">
                 <label for="name">Nom complet</label>
@@ -183,13 +216,19 @@
         </form>
     </div>
 
+    <!-- VUE 2 : Page de confirmation -->
+    <div class="card-container success-view hidden" id="success-view">
+        <div class="success-icon">✓</div>
+        <h1>Connexion Réussie</h1>
+        <p id="welcome-user" style="margin-top: 8px;">Bienvenue sur Tempo !</p>
+        <button class="submit-btn logout-btn" onclick="logout()">Se déconnecter</button>
+    </div>
+
     <script>
         // Enregistrement du Service Worker PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
         }
-
-        let isLoginMode = true;
 
         function switchMode(mode) {
             const loginTab = document.getElementById('login-tab');
@@ -199,14 +238,12 @@
             const subtitle = document.getElementById('subtitle');
 
             if (mode === 'login') {
-                isLoginMode = true;
                 loginTab.classList.add('active');
                 registerTab.classList.remove('active');
                 nameGroup.classList.add('hidden');
                 submitBtnText.textContent = "Se connecter";
                 subtitle.textContent = "Connecte-toi pour gérer tes routines";
             } else {
-                isLoginMode = false;
                 registerTab.classList.add('active');
                 loginTab.classList.remove('active');
                 nameGroup.classList.remove('hidden');
@@ -219,14 +256,17 @@
             event.preventDefault();
             const email = document.getElementById('email').value;
             
-            // Simulation d'une authentification réussie (on simulera le passage vers ton tableau de bord de routines plus tard)
-            if (isLoginMode) {
-                alert(`Bon retour parmi nous, ${email} !`);
-            } else {
-                alert(`Compte créé avec succès pour ${email} !`);
-            }
-            
-            // Ici, tu pourras rediriger vers l'application principale une fois authentifié
+            // Bascule instantanée vers l'écran "Connexion Réussie"
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('success-view').classList.remove('hidden');
+            document.getElementById('welcome-user').textContent = `Connecté avec : ${email}`;
+        }
+
+        function logout() {
+            // Retour à l'écran de connexion
+            document.getElementById('auth-form').reset();
+            document.getElementById('success-view').classList.add('hidden');
+            document.getElementById('auth-view').classList.remove('hidden');
         }
     </script>
 </body>
