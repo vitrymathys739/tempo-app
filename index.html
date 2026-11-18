@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tempo - Connexion</title>
+    <title>Tempo - Mon Espace</title>
 
     <!-- Balises PWA / iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,7 +42,7 @@
 
         .card-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             padding: 32px;
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -57,7 +57,7 @@
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 1.85rem;
             margin: 0 0 8px 0;
             font-weight: 700;
             letter-spacing: -0.025em;
@@ -117,18 +117,22 @@
 
         input[type="text"],
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="date"],
+        select {
             background: var(--bg-color);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px 16px;
+            padding: 12px 14px;
             color: var(--text-color);
             font-size: 0.95rem;
             outline: none;
             transition: border-color 0.2s;
+            font-family: inherit;
+            color-scheme: dark;
         }
 
-        input:focus {
+        input:focus, select:focus {
             border-color: var(--accent);
         }
 
@@ -139,6 +143,7 @@
             font-size: 0.8rem;
             color: var(--text-muted);
             line-height: 1.4;
+            margin-top: 4px;
         }
 
         .rgpd-box input[type="checkbox"] {
@@ -147,14 +152,24 @@
             cursor: pointer;
         }
 
-        .error-banner {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--error);
-            color: #fca5a5;
+        .banner {
             padding: 10px 14px;
             border-radius: 10px;
             font-size: 0.85rem;
             text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .error-banner {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--error);
+            color: #fca5a5;
+        }
+
+        .info-banner {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--success);
+            color: #6ee7b7;
         }
 
         .submit-btn {
@@ -164,7 +179,7 @@
             border-radius: 10px;
             padding: 12px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: background 0.2s;
             margin-top: 4px;
@@ -180,35 +195,66 @@
             cursor: not-allowed;
         }
 
-        .logout-btn {
+        .secondary-btn {
             background: var(--bg-color);
-            color: var(--text-muted);
+            color: var(--text-color);
             border: 1px solid var(--border);
-            margin-top: 24px;
+            margin-top: 12px;
         }
 
-        .logout-btn:hover {
-            color: var(--text-color);
+        .secondary-btn:hover {
             border-color: var(--text-muted);
+            background: #202024;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin: 16px 0 4px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .profile-summary {
             background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin: 16px 0;
+            text-align: left;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .success-view {
             text-align: center;
-            padding: 16px 0;
+            padding: 8px 0;
         }
 
         .success-icon {
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             background: rgba(16, 185, 129, 0.15);
             color: var(--success);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
-            margin: 0 auto 16px auto;
+            font-size: 1.5rem;
+            margin: 0 auto 14px auto;
         }
 
         .hidden {
@@ -218,7 +264,7 @@
 </head>
 <body>
 
-    <!-- VUE 1 : Formulaire de Connexion / Inscription -->
+    <!-- VUE 1 : Connexion / Inscription rapide -->
     <div class="card-container" id="auth-view">
         <div class="logo-area">
             <h1>Tempo</h1>
@@ -230,12 +276,12 @@
             <button class="tab-btn" id="register-tab" onclick="switchMode('register')">Inscription</button>
         </div>
 
-        <div id="error-message" class="error-banner hidden" style="margin-bottom: 16px;"></div>
+        <div id="auth-banner" class="banner error-banner hidden"></div>
 
-        <form id="auth-form" onsubmit="handleSubmit(event)">
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)">
             <div class="form-group hidden" id="name-group">
-                <label for="name">Nom complet</label>
-                <input type="text" id="name" placeholder="Ex: Jean Dupont">
+                <label for="name">Prénom ou Pseudo</label>
+                <input type="text" id="name" placeholder="Ex: Alex">
             </div>
 
             <div class="form-group">
@@ -248,45 +294,132 @@
                 <input type="password" id="password" required minlength="6" placeholder="••••••••">
             </div>
 
-            <!-- Case de consentement RGPD visible uniquement à l'inscription -->
             <div class="rgpd-box hidden" id="rgpd-group">
                 <input type="checkbox" id="rgpd-consent">
                 <label for="rgpd-consent" style="cursor: pointer;">
-                    J'accepte que mes données soient traitées de manière sécurisée en Europe (UE) conformément au RGPD pour le fonctionnement de mon compte Tempo.
+                    J'accepte que mes données soient hébergées en Europe (UE) conformément au RGPD pour faire fonctionner mon compte Tempo.
                 </label>
             </div>
 
-            <button type="submit" class="submit-btn" id="submit-btn">Se connecter</button>
+            <button type="submit" class="submit-btn" id="auth-submit-btn">Se connecter</button>
         </form>
+
+        <div id="passkey-login-section">
+            <div class="divider"><span>ou</span></div>
+            <button type="button" class="submit-btn secondary-btn" onclick="loginWithPasskey()">
+                🔑 Continuer avec une Passkey
+            </button>
+        </div>
     </div>
 
-    <!-- VUE 2 : Page de confirmation -->
+    <!-- VUE 2 : Compléter le profil (S'affiche après création de compte) -->
+    <div class="card-container hidden" id="onboarding-view">
+        <div class="logo-area">
+            <h1>Complétez votre profil</h1>
+            <p>Ces informations permettent d'adapter Tempo à ton rythme</p>
+        </div>
+
+        <div id="onboarding-banner" class="banner error-banner hidden"></div>
+
+        <form id="onboarding-form" onsubmit="handleProfileSubmit(event)">
+            <div class="form-group">
+                <label for="birth-date">Date de naissance (10 ans minimum)</label>
+                <input type="date" id="birth-date" required onchange="checkAgeRequirement()">
+            </div>
+
+            <!-- Case accord parental affichée uniquement entre 10 et 14 ans (RGPD France) -->
+            <div class="rgpd-box hidden" id="parental-group">
+                <input type="checkbox" id="parental-consent">
+                <label for="parental-consent" style="cursor: pointer;">
+                    Ayant moins de 15 ans, je confirme avoir l'autorisation d'un parent ou tuteur légal pour créer mon compte Tempo.
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="situation-select">Situation actuelle</label>
+                <select id="situation-select" required>
+                    <option value="">Sélectionne ta situation...</option>
+                    <option value="college">Étudiant au collège</option>
+                    <option value="lycee">Étudiant au lycée</option>
+                    <option value="superieur">Étudiant dans le supérieur (Fac, BTS, École...)</option>
+                    <option value="alternance">En alternance / Apprentissage</option>
+                    <option value="salarie">Salarié(e)</option>
+                    <option value="independant">Indépendant(e) / Entrepreneur</option>
+                    <option value="recherche">En recherche d'emploi / Reconversion</option>
+                    <option value="autre">Autre situation</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn" id="profile-submit-btn">Terminer l'inscription</button>
+        </form>
+
+        <button type="button" class="submit-btn secondary-btn" onclick="logout()">Annuler et se déconnecter</button>
+    </div>
+
+    <!-- VUE 3 : Connexion Réussie & Sécurité -->
     <div class="card-container success-view hidden" id="success-view">
         <div class="success-icon">✓</div>
         <h1>Connexion Réussie</h1>
-        <p id="welcome-user" style="margin-top: 8px;">Bienvenue sur Tempo !</p>
-        <p style="font-size: 0.8rem; margin-top: 12px;">Session sécurisée active</p>
-        <button class="submit-btn logout-btn" onclick="logout()">Se déconnecter</button>
+        <p id="welcome-user" style="margin-top: 6px;">Bienvenue sur Tempo !</p>
+
+        <div id="success-banner" class="banner info-banner hidden" style="margin-top: 14px;"></div>
+
+        <div class="profile-summary">
+            <div><strong>Email :</strong> <span id="prof-email">-</span></div>
+            <div><strong>Profil :</strong> <span id="prof-name">-</span></div>
+            <div><strong>Âge :</strong> <span id="prof-age">-</span></div>
+            <div><strong>Situation :</strong> <span id="prof-situation">-</span></div>
+        </div>
+
+        <button class="submit-btn" onclick="registerPasskey()">
+            🛡️ Créer une Passkey sur cet appareil
+        </button>
+
+        <button class="submit-btn secondary-btn" onclick="logout()">Se déconnecter</button>
     </div>
 
     <script>
-        // Enregistrement du Service Worker PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
         }
 
-        const SUPABASE_URL = 'https://kgrgetlhsedhhjgjxonj.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_-mMY5b7LTRwzCE5ny1aMSw_8KEvUMCT';
+        // ⚠️ REMPLACE CES DEUX VALEURS PAR CELLES DE TON PROJET SUPABASE ⚠️
+        const SUPABASE_URL = 'https://TON-PROJET.supabase.co';
+        const SUPABASE_ANON_KEY = 'TA-PUBLISHABLE-KEY';
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let isLoginMode = true;
+        let currentUser = null;
 
-        // Vérifier automatiquement si l'utilisateur est déjà connecté au chargement
+        const situationLabels = {
+            'college': 'Étudiant au collège',
+            'lycee': 'Étudiant au lycée',
+            'superieur': 'Étudiant dans le supérieur',
+            'alternance': 'En alternance / Apprentissage',
+            'salarie': 'Salarié(e)',
+            'independant': 'Indépendant(e) / Entrepreneur',
+            'recherche': 'En recherche d\'emploi',
+            'autre': 'Autre situation'
+        };
+
+        // Calcul précis de l'âge en années
+        function calculateAge(birthDateString) {
+            const today = new Date();
+            const birthDate = new Date(birthDateString);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        // Vérifie la session au chargement de l'app
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
-                showSuccessView(session.user.email);
+                await routeUserAfterAuth(session.user);
             }
         });
 
@@ -296,9 +429,10 @@
             const nameGroup = document.getElementById('name-group');
             const rgpdGroup = document.getElementById('rgpd-group');
             const rgpdConsent = document.getElementById('rgpd-consent');
-            const submitBtn = document.getElementById('submit-btn');
+            const passkeySection = document.getElementById('passkey-login-section');
+            const submitBtn = document.getElementById('auth-submit-btn');
             const subtitle = document.getElementById('subtitle');
-            hideError();
+            hideBanner('auth-banner');
 
             if (mode === 'login') {
                 isLoginMode = true;
@@ -306,6 +440,7 @@
                 registerTab.classList.remove('active');
                 nameGroup.classList.add('hidden');
                 rgpdGroup.classList.add('hidden');
+                passkeySection.classList.remove('hidden');
                 rgpdConsent.required = false;
                 submitBtn.textContent = "Se connecter";
                 subtitle.textContent = "Connecte-toi pour gérer tes routines";
@@ -315,86 +450,219 @@
                 loginTab.classList.remove('active');
                 nameGroup.classList.remove('hidden');
                 rgpdGroup.classList.remove('hidden');
+                passkeySection.classList.add('hidden');
                 rgpdConsent.required = true;
-                submitBtn.textContent = "Créer mon compte";
-                subtitle.textContent = "Crée un compte pour commencer";
+                submitBtn.textContent = "Continuer";
+                subtitle.textContent = "Crée ton compte Tempo en quelques secondes";
             }
         }
 
-        async function handleSubmit(event) {
+        // Étape 1 : Connexion ou création du compte Auth
+        async function handleAuthSubmit(event) {
             event.preventDefault();
-            hideError();
+            hideBanner('auth-banner');
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const fullName = document.getElementById('name').value.trim();
-            const submitBtn = document.getElementById('submit-btn');
+            const submitBtn = document.getElementById('auth-submit-btn');
 
             submitBtn.disabled = true;
             submitBtn.textContent = "Chargement...";
 
             try {
                 if (isLoginMode) {
-                    // Connexion via Supabase
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({
-                        email: email,
-                        password: password,
-                    });
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (error) throw error;
-                    showSuccessView(data.user.email);
+                    await routeUserAfterAuth(data.user);
                 } else {
-                    // Inscription via Supabase avec métadonnées minimales
                     const { data, error } = await supabaseClient.auth.signUp({
-                        email: email,
-                        password: password,
-                        options: {
-                            data: { full_name: fullName }
-                        }
+                        email,
+                        password,
+                        options: { data: { full_name: fullName } }
                     });
                     if (error) throw error;
-                    
-                    if (data.session) {
-                        showSuccessView(data.user.email);
+
+                    if (data.user && data.session) {
+                        await routeUserAfterAuth(data.user);
                     } else {
-                        showError("Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.");
+                        showBanner('auth-banner', "Compte créé ! Vérifie tes emails pour valider ton adresse avant de continuer.", 'info');
                     }
                 }
             } catch (error) {
-                showError(traductionErreur(error.message));
+                showBanner('auth-banner', traductionErreur(error.message), 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = isLoginMode ? "Se connecter" : "Créer mon compte";
+                submitBtn.textContent = isLoginMode ? "Se connecter" : "Continuer";
+            }
+        }
+
+        // Aiguillage : si le profil existe -> Vue 3, sinon -> Vue 2 (Complétez votre profil)
+        async function routeUserAfterAuth(user) {
+            currentUser = user;
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            document.getElementById('auth-view').classList.add('hidden');
+
+            if (profile) {
+                showSuccessView(user, profile);
+            } else {
+                document.getElementById('success-view').classList.add('hidden');
+                document.getElementById('onboarding-view').classList.remove('hidden');
+            }
+        }
+
+        // Vérification dynamique de l'âge à la saisie de la date
+        function checkAgeRequirement() {
+            const birthDateVal = document.getElementById('birth-date').value;
+            const parentalGroup = document.getElementById('parental-group');
+            const parentalConsent = document.getElementById('parental-consent');
+            hideBanner('onboarding-banner');
+
+            if (!birthDateVal) return;
+            const age = calculateAge(birthDateVal);
+
+            if (age < 10) {
+                showBanner('onboarding-banner', "Désolé, l'inscription sur Tempo est réservée aux personnes âgées d'au moins 10 ans.", 'error');
+                parentalGroup.classList.add('hidden');
+                parentalConsent.required = false;
+            } else if (age < 15) {
+                parentalGroup.classList.remove('hidden');
+                parentalConsent.required = true;
+            } else {
+                parentalGroup.classList.add('hidden');
+                parentalConsent.required = false;
+            }
+        }
+
+        // Étape 2 : Enregistrement des infos de profil
+        async function handleProfileSubmit(event) {
+            event.preventDefault();
+            hideBanner('onboarding-banner');
+
+            const birthDate = document.getElementById('birth-date').value;
+            const situation = document.getElementById('situation-select').value;
+            const parentalConsent = document.getElementById('parental-consent').checked;
+            const submitBtn = document.getElementById('profile-submit-btn');
+
+            const age = calculateAge(birthDate);
+
+            // Blocage strict des moins de 10 ans
+            if (age < 10) {
+                showBanner('onboarding-banner', "Inscription refusée : tu dois avoir au moins 10 ans pour utiliser Tempo.", 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Enregistrement...";
+
+            try {
+                const fullName = currentUser.user_metadata?.full_name || 'Utilisateur Tempo';
+                const newProfile = {
+                    id: currentUser.id,
+                    full_name: fullName,
+                    birth_date: birthDate,
+                    situation: situation,
+                    parental_consent: age < 15 ? parentalConsent : true
+                };
+
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .insert([newProfile]);
+
+                if (error) throw error;
+
+                document.getElementById('onboarding-view').classList.add('hidden');
+                showSuccessView(currentUser, newProfile);
+            } catch (err) {
+                showBanner('onboarding-banner', "Erreur lors de l'enregistrement : " + err.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Terminer l'inscription";
+            }
+        }
+
+        function showSuccessView(user, profile) {
+            document.getElementById('success-view').classList.remove('hidden');
+            const age = calculateAge(profile.birth_date);
+
+            document.getElementById('welcome-user').textContent = `Bienvenue, ${profile.full_name} !`;
+            document.getElementById('prof-email').textContent = user.email;
+            document.getElementById('prof-name').textContent = profile.full_name;
+            document.getElementById('prof-age').textContent = `${age} ans`;
+            document.getElementById('prof-situation').textContent = situationLabels[profile.situation] || profile.situation;
+        }
+
+        // --- PASSKEYS ---
+        async function registerPasskey() {
+            hideBanner('success-banner');
+            try {
+                if (!window.PublicKeyCredential) {
+                    throw new Error("Ton navigateur ne supporte pas les Passkeys.");
+                }
+                const { error } = await supabaseClient.auth.mfa.enroll({
+                    factorType: 'webauthn',
+                    friendlyName: 'Appareil Tempo (' + navigator.platform + ')'
+                });
+                if (error) throw error;
+                showBanner('success-banner', "✅ Passkey enregistrée avec succès sur cet appareil !", 'info');
+            } catch (err) {
+                showBanner('success-banner', "Erreur Passkey : " + err.message, 'error');
+            }
+        }
+
+        async function loginWithPasskey() {
+            hideBanner('auth-banner');
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                showBanner('auth-banner', "Saisis d'abord ton adresse email ci-dessus pour utiliser ta Passkey.", 'error');
+                return;
+            }
+            try {
+                if (!window.PublicKeyCredential) {
+                    throw new Error("Les Passkeys ne sont pas supportées sur cet appareil.");
+                }
+                const { data, error } = await supabaseClient.auth.signInWithWebAuthn({ email });
+                if (error) throw error;
+                if (data.user) await routeUserAfterAuth(data.user);
+            } catch (err) {
+                showBanner('auth-banner', "Connexion Passkey impossible : " + err.message, 'error');
             }
         }
 
         async function logout() {
             await supabaseClient.auth.signOut();
+            currentUser = null;
             document.getElementById('auth-form').reset();
+            document.getElementById('onboarding-form').reset();
+            hideBanner('auth-banner');
+            hideBanner('onboarding-banner');
+            hideBanner('success-banner');
             document.getElementById('success-view').classList.add('hidden');
+            document.getElementById('onboarding-view').classList.add('hidden');
             document.getElementById('auth-view').classList.remove('hidden');
         }
 
-        function showSuccessView(email) {
-            document.getElementById('auth-view').classList.add('hidden');
-            document.getElementById('success-view').classList.remove('hidden');
-            document.getElementById('welcome-user').textContent = `Connecté avec : ${email}`;
+        function showBanner(id, msg, type) {
+            const banner = document.getElementById(id);
+            banner.textContent = msg;
+            banner.className = `banner ${type === 'error' ? 'error-banner' : 'info-banner'}`;
+            banner.classList.remove('hidden');
         }
 
-        function showError(msg) {
-            const errDiv = document.getElementById('error-message');
-            errDiv.textContent = msg;
-            errDiv.classList.remove('hidden');
-        }
-
-        function hideError() {
-            document.getElementById('error-message').classList.add('hidden');
+        function hideBanner(id) {
+            document.getElementById(id).classList.add('hidden');
         }
 
         function traductionErreur(message) {
             if (message.includes("Invalid login credentials")) return "Email ou mot de passe incorrect.";
             if (message.includes("User already registered")) return "Un compte existe déjà avec cet email.";
             if (message.includes("Password should be at least")) return "Le mot de passe doit faire au moins 6 caractères.";
-            return "Une erreur est survenue : " + message;
+            return "Erreur : " + message;
         }
     </script>
 </body>
