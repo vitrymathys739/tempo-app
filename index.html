@@ -3,61 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tempo - Mon App de Routine</title>
+    <title>Tempo - Gestion de routines</title>
 
-    <!-- Balises spécifiques pour iOS (iPhone) -->
+    <!-- Balises PWA / iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Tempo">
-    
-    <!-- Lien vers le fichier manifest pour l'installation multi-plateforme -->
     <link rel="manifest" href="manifest.json">
 
     <style>
+        :root {
+            --bg-color: #09090b;
+            --card-bg: #18181b;
+            --text-color: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #27272a;
+        }
+
         body {
             margin: 0;
-            height: 100vh;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
         }
-        .container {
-            text-align: center;
-        }
+
         h1 {
-            font-size: 2.5rem;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
+            font-size: 1.75rem;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -0.025em;
         }
-        p {
-            color: #64748b;
-            font-size: 1.1rem;
+
+        .date-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
         }
-  </style>
+
+        /* Section d'ajout de routine */
+        .add-routine-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Liste des tâches/routines */
+        .routines-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .routine-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.1s, border-color 0.2s;
+        }
+
+        .routine-item.completed {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .routine-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .routine-text {
+            flex: 1;
+            font-size: 1rem;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Tempo</h1>
-        <p>Application prête pour iOS et Android !</p>
+    <div class="app-container">
+        <header>
+            <h1>Tempo</h1>
+            <div class="date-badge" id="current-date">Aujourd'hui</div>
+        </header>
+
+        <!-- Formulaire d'ajout -->
+        <div class="add-routine-box">
+            <input type="text" id="routine-input" placeholder="Ajouter une nouvelle routine..." autocomplete="off">
+            <button id="add-btn">Ajouter</button>
+        </div>
+
+        <!-- Liste des routines -->
+        <ul class="routines-list" id="routines-list">
+            <!-- Les routines s'afficheront ici -->
+        </ul>
     </div>
 
-    <!-- Script pour enregistrer le Service Worker (nécessaire pour Android / PWA) -->
     <script>
+        // Enregistrement du Service Worker
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then((reg) => {
-                        console.log('Service Worker enregistré avec succès :', reg.scope);
-                    })
-                    .catch((err) => {
-                        console.log('Échec de l\'enregistrement du Service Worker :', err);
-                    });
+            navigator.serviceWorker.register('/sw.js');
+        }
+
+        // Affichage de la date du jour en français
+        const options = { weekday: 'long', day: 'numeric', month: 'short' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR', options);
+
+        // Logique de l'application (Stockage local + Dynamisme)
+        const input = document.getElementById('routine-input');
+        const addBtn = document.getElementById('add-btn');
+        const list = document.getElementById('routines-list');
+
+        // Charger les routines sauvegardées ou utiliser des exemples par défaut
+        let routines = JSON.parse(localStorage.getItem('tempo_routines')) || [
+            { text: "🌅 Méditation / Respiration (10 min)", completed: false },
+            { text: "💧 Boire un grand verre d'eau", completed: true },
+            { text: "💻 Planifier les tâches de la journée", completed: false }
+        ];
+
+        function saveAndRender() {
+            localStorage.setItem('tempo_routines', JSON.stringify(routines));
+            renderRoutines();
+        }
+
+        function renderRoutines() {
+            list.innerHTML = '';
+            routines.forEach((routine, index) => {
+                const li = document.createElement('li');
+                li.className = `routine-item ${routine.completed ? 'completed' : ''}`;
+                
+                li.innerHTML = `
+                    <input type="checkbox" ${routine.completed ? 'checked' : ''} onchange="toggleRoutine(${index})">
+                    <span class="routine-text">${escapeHtml(routine.text)}</span>
+                `;
+                list.appendChild(li);
             });
         }
+
+        function toggleRoutine(index) {
+            routines[index].completed = !routines[index].completed;
+            saveAndRender();
+        }
+
+        function addRoutine() {
+            const text = input.value.trim();
+            if (text) {
+                routines.push({ text: text, completed: false });
+                input.value = '';
+                saveAndRender();
+            }
+        }
+
+        addBtn.addEventListener('click', addRoutine);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addRoutine();
+        });
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // Premier affichage au chargement
+        renderRoutines();
     </script>
 </body>
 </html>
