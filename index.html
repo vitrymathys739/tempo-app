@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tempo - Tableau de bord</title>
+    <title>Tempo - Emploi du temps & Routines</title>
 
     <!-- Balises PWA / iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -44,10 +44,10 @@
             align-items: center;
         }
 
-        /* Mode aligné en haut quand on est sur le Dashboard */
         body.dashboard-active {
             align-items: flex-start;
-            padding-top: 24px;
+            padding-top: 20px;
+            padding-bottom: 40px;
         }
 
         /* --- CONTENEURS AUTH & ONBOARDING --- */
@@ -134,9 +134,9 @@
             background: var(--bg-color);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px 14px;
+            padding: 10px 14px;
             color: var(--text-color);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             outline: none;
             transition: border-color 0.2s;
             font-family: inherit;
@@ -217,10 +217,10 @@
             background: var(--card-hover);
         }
 
-        /* --- VUE 3 : DASHBOARD GLOBAL --- */
+        /* --- VUE 3 : DASHBOARD GLOBAL & EMPLOI DU TEMPS PRONOTE --- */
         .dashboard-container {
             width: 100%;
-            max-width: 820px;
+            max-width: 1180px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -255,12 +255,34 @@
             font-weight: 500;
         }
 
+        .topbar-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .primary-small-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .primary-small-btn:hover {
+            background: var(--accent-hover);
+        }
+
         .logout-small-btn {
             background: var(--bg-color);
             color: var(--text-muted);
             border: 1px solid var(--border);
             padding: 8px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
@@ -279,7 +301,7 @@
             gap: 16px;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -289,34 +311,35 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px 20px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
         }
 
         .stat-value {
-            font-size: 1.75rem;
+            font-size: 1.55rem;
             font-weight: 700;
             color: var(--text-color);
         }
 
         .stat-sub {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--success);
         }
 
-        /* Section Routines */
-        .routines-panel {
+        /* --- EMPLOI DU TEMPS HEBDOMADAIRE (STYLE PRONOTE) --- */
+        .timetable-panel {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px;
+            overflow: hidden;
         }
 
         .panel-header {
@@ -324,49 +347,273 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .panel-header h3 {
             margin: 0;
             font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        /* Conteneur défilable horizontalement sur mobile */
+        .timetable-scroll {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-color);
+        }
+
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 56px repeat(7, minmax(125px, 1fr));
+            min-width: 930px;
+        }
+
+        /* En-têtes des jours */
+        .tt-header-corner {
+            background: #121215;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            height: 44px;
+        }
+
+        .tt-day-header {
+            background: #121215;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .tt-day-header:last-child {
+            border-right: none;
+        }
+
+        .tt-day-header.today {
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        /* Colonne des heures (07h -> 22h = 15 heures * 48px = 720px) */
+        .tt-time-col {
+            border-right: 1px solid var(--border);
+            background: #121215;
+        }
+
+        .tt-time-slot {
+            height: 48px;
+            border-bottom: 1px solid #1f1f23;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Colonnes des jours contenant les blocs */
+        .tt-day-col {
+            position: relative;
+            height: 720px; /* 15 heures * 48px */
+            border-right: 1px solid var(--border);
+            background-image: linear-gradient(to bottom, #1f1f23 1px, transparent 1px);
+            background-size: 100% 48px;
+        }
+
+        .tt-day-col:last-child {
+            border-right: none;
+        }
+
+        .tt-day-col.today {
+            background-color: rgba(59, 130, 246, 0.02);
+        }
+
+        /* Bloc créneau style Pronote */
+        .tt-event {
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            border-radius: 6px;
+            padding: 5px 7px;
+            font-size: 0.78rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-left: 4px solid;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+            transition: transform 0.15s, filter 0.15s;
+            cursor: pointer;
+        }
+
+        .tt-event:hover {
+            filter: brightness(1.12);
+            z-index: 10;
+        }
+
+        .tt-event-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .tt-event-title {
+            font-weight: 700;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .tt-event-del {
+            background: rgba(0,0,0,0.25);
+            border: none;
+            color: inherit;
+            border-radius: 4px;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            line-height: 1;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tt-event:hover .tt-event-del {
+            display: flex;
+        }
+
+        .tt-event-meta {
+            font-size: 0.7rem;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        /* Thèmes de couleurs des créneaux */
+        .cat-cours {
+            background: rgba(59, 130, 246, 0.22);
+            border-left-color: #3b82f6;
+            color: #dbeafe;
+        }
+        .cat-revisions {
+            background: rgba(168, 85, 247, 0.22);
+            border-left-color: #a855f7;
+            color: #f3e8ff;
+        }
+        .cat-sport {
+            background: rgba(16, 185, 129, 0.22);
+            border-left-color: #10b981;
+            color: #d1fae5;
+        }
+        .cat-routine {
+            background: rgba(245, 158, 11, 0.22);
+            border-left-color: #f59e0b;
+            color: #fef3c7;
+        }
+
+        /* --- MODALE AJOUT DE CRÉNEAU --- */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            padding: 24px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .time-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* --- SECTION ROUTINES RAPIDES DU JOUR --- */
+        .routines-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
         }
 
         .add-routine-bar {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
-        }
-
-        .add-routine-bar input[type="time"] {
-            width: 115px;
         }
 
         .add-routine-bar input[type="text"] {
             flex: 1;
-            min-width: 180px;
-        }
-
-        .add-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0 20px;
-            height: 44px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .add-btn:hover {
-            background: var(--accent-hover);
+            min-width: 200px;
         }
 
         .routine-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .routine-item {
@@ -375,45 +622,29 @@
             justify-content: space-between;
             background: var(--bg-color);
             border: 1px solid var(--border);
-            padding: 14px 16px;
-            border-radius: 12px;
-            transition: all 0.2s;
+            padding: 12px 14px;
+            border-radius: 10px;
         }
 
         .routine-item.completed {
-            opacity: 0.6;
+            opacity: 0.55;
         }
 
         .routine-item.completed .routine-title {
             text-decoration: line-through;
-            color: var(--text-muted);
         }
 
         .routine-left {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
 
         .routine-checkbox {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             accent-color: var(--success);
             cursor: pointer;
-        }
-
-        .routine-time {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent);
-            background: rgba(59, 130, 246, 0.12);
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .routine-title {
-            font-size: 0.95rem;
-            font-weight: 500;
         }
 
         .delete-btn {
@@ -421,14 +652,11 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 1.1rem;
-            padding: 4px 8px;
-            border-radius: 6px;
+            font-size: 1rem;
         }
 
         .delete-btn:hover {
             color: var(--error);
-            background: rgba(239, 68, 68, 0.1);
         }
 
         .hidden {
@@ -479,11 +707,11 @@
         </form>
     </div>
 
-    <!-- VUE 2 : Compléter le profil (Uniquement après création de compte) -->
+    <!-- VUE 2 : Compléter le profil -->
     <div class="card-container hidden" id="onboarding-view">
         <div class="logo-area">
             <h1>Complétez votre profil</h1>
-            <p>Dernière étape avant d'accéder à ton tableau de bord</p>
+            <p>Dernière étape avant d'accéder à ton emploi du temps</p>
         </div>
 
         <div id="onboarding-banner" class="banner error-banner hidden"></div>
@@ -494,7 +722,6 @@
                 <input type="date" id="birth-date" required onchange="checkAgeRequirement()">
             </div>
 
-            <!-- Accord parental si 10-14 ans -->
             <div class="rgpd-box hidden" id="parental-group">
                 <input type="checkbox" id="parental-consent">
                 <label for="parental-consent" style="cursor: pointer;">
@@ -523,7 +750,7 @@
         <button type="button" class="submit-btn secondary-btn" onclick="logout()">Annuler et se déconnecter</button>
     </div>
 
-    <!-- VUE 3 : PAGE D'ACCUEIL & DASHBOARD GLOBAL -->
+    <!-- VUE 3 : DASHBOARD GLOBAL + EMPLOI DU TEMPS PRONOTE -->
     <div class="dashboard-container hidden" id="dashboard-view">
         <!-- Barre supérieure -->
         <header class="topbar">
@@ -531,44 +758,121 @@
                 <h2 id="dash-welcome">Bonjour !</h2>
                 <span class="user-badge" id="dash-badge">Profil Tempo</span>
             </div>
-            <button class="logout-small-btn" onclick="logout()">Se déconnecter</button>
+            <div class="topbar-actions">
+                <button class="primary-small-btn" onclick="openSlotModal()">+ Ajouter un créneau</button>
+                <button class="logout-small-btn" onclick="logout()">Se déconnecter</button>
+            </div>
         </header>
 
-        <!-- Cartes de statistiques globales -->
+        <!-- Cartes de synthèse -->
         <section class="stats-grid">
             <div class="stat-card">
-                <span class="stat-label">Routines du jour</span>
-                <span class="stat-value" id="stat-total">0</span>
-                <span class="stat-sub">Planifiées aujourd'hui</span>
+                <span class="stat-label">Créneaux cette semaine</span>
+                <span class="stat-value" id="stat-slots">0</span>
+                <span class="stat-sub">Emploi du temps actif</span>
             </div>
             <div class="stat-card">
-                <span class="stat-label">Progression</span>
+                <span class="stat-label">Objectifs du jour</span>
                 <span class="stat-value" id="stat-percent">0%</span>
-                <span class="stat-sub" id="stat-done-text">0 terminée</span>
+                <span class="stat-sub" id="stat-done-text">0/0 accompli</span>
             </div>
             <div class="stat-card">
-                <span class="stat-label">Date du jour</span>
-                <span class="stat-value" id="stat-date" style="font-size: 1.35rem; margin-top: 4px;">-</span>
-                <span class="stat-sub">Rythme actif</span>
+                <span class="stat-label">Aujourd'hui</span>
+                <span class="stat-value" id="stat-date" style="font-size: 1.3rem; margin-top: 2px;">-</span>
+                <span class="stat-sub">Semaine en cours</span>
             </div>
         </section>
 
-        <!-- Gestionnaire de routines -->
+        <!-- EMPLOI DU TEMPS HEBDOMADAIRE (CENTRE DU DASHBOARD) -->
+        <section class="timetable-panel">
+            <div class="panel-header">
+                <h3>📅 Emploi du temps hebdomadaire</h3>
+                <div class="legend">
+                    <span class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span>Cours / Travail</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#a855f7;"></span>Révisions / Projets</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#10b981;"></span>Sport / Santé</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span>Routine / Perso</span>
+                </div>
+            </div>
+
+            <div class="timetable-scroll">
+                <div class="timetable-grid" id="timetable-grid">
+                    <!-- Généré dynamiquement en JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Checklist rapide des habitudes du jour -->
         <section class="routines-panel">
             <div class="panel-header">
-                <h3>Mon programme du jour</h3>
+                <h3>✅ Mes habitudes quotidiennes</h3>
             </div>
 
             <form class="add-routine-bar" onsubmit="addRoutine(event)">
-                <input type="time" id="routine-time" value="08:00" required>
-                <input type="text" id="routine-title" placeholder="Ajouter une routine (ex: Révisions, Sport, Lecture...)" required>
-                <button type="submit" class="add-btn">+ Ajouter</button>
+                <input type="text" id="routine-title" placeholder="Ajouter une petite habitude (ex: Boire 1.5L d'eau, Lire 15 min...)" required>
+                <button type="submit" class="primary-small-btn">+ Ajouter</button>
             </form>
 
-            <div class="routine-list" id="routine-list">
-                <!-- Les routines s'affichent ici -->
-            </div>
+            <div class="routine-list" id="routine-list"></div>
         </section>
+    </div>
+
+    <!-- MODALE : AJOUTER UN CRÉNEAU À L'EMPLOI DU TEMPS -->
+    <div class="modal-backdrop hidden" id="slot-modal" onclick="closeSlotModalOnBackdrop(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Nouveau créneau</h3>
+                <button class="close-modal" onclick="closeSlotModal()">✕</button>
+            </div>
+
+            <form onsubmit="saveTimetableSlot(event)">
+                <div class="form-group">
+                    <label for="slot-title">Intitulé (Cours, Activité, Routine...)</label>
+                    <input type="text" id="slot-title" required placeholder="Ex: Mathématiques, Sport, Révisions...">
+                </div>
+
+                <div class="form-group">
+                    <label for="slot-room">Lieu / Détail (Optionnel)</label>
+                    <input type="text" id="slot-room" placeholder="Ex: Salle B12, Maison, Gymnase...">
+                </div>
+
+                <div class="form-group">
+                    <label for="slot-day">Jour de la semaine</label>
+                    <select id="slot-day" required>
+                        <option value="0">Lundi</option>
+                        <option value="1">Mardi</option>
+                        <option value="2">Mercredi</option>
+                        <option value="3">Jeudi</option>
+                        <option value="4">Vendredi</option>
+                        <option value="5">Samedi</option>
+                        <option value="6">Dimanche</option>
+                    </select>
+                </div>
+
+                <div class="time-row">
+                    <div class="form-group">
+                        <label for="slot-start">Début (07:00 min)</label>
+                        <input type="time" id="slot-start" value="08:00" min="07:00" max="21:30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slot-end">Fin (22:00 max)</label>
+                        <input type="time" id="slot-end" value="09:30" min="07:30" max="22:00" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="slot-category">Catégorie / Couleur</label>
+                    <select id="slot-category" required>
+                        <option value="cours">🔵 Cours / Travail</option>
+                        <option value="revisions">🟣 Révisions / Projets</option>
+                        <option value="sport">🟢 Sport / Santé</option>
+                        <option value="routine">🟠 Routine / Temps libre</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">Ajouter à l'emploi du temps</button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -576,15 +880,21 @@
             navigator.serviceWorker.register('/sw.js');
         }
 
-        // ⚠️ REMPLACE CES DEUX VALEURS PAR CELLES DE TON PROJET SUPABASE ⚠️
+        // ⚠️ REMPLACE TA PUBLISHABLE KEY CI-DESSOUS ⚠️
         const SUPABASE_URL = 'https://kgrgetlhsedhhjgjxonj.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_-mMY5b7LTRwzCE5ny1aMSw_8KEvUMCT';
+        const SUPABASE_ANON_KEY = 'TA-PUBLISHABLE-KEY';
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let isLoginMode = true;
         let currentUser = null;
-        let routines = [];
+        let timetableSlots = [];
+        let dailyRoutines = [];
+
+        const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+        const START_HOUR = 7;  // 07h00
+        const END_HOUR = 22;   // 22h00
+        const HOUR_HEIGHT = 48; // 48px par heure
 
         const situationLabels = {
             'college': 'Étudiant au collège',
@@ -597,24 +907,16 @@
             'autre': 'Autre situation'
         };
 
-        // Routines suggérées par défaut lors de la première visite selon la situation
-        const defaultRoutinesBySituation = {
-            'college': [
-                { id: 1, time: '07:30', title: 'Préparation du sac et petit-déjeuner', done: true },
-                { id: 2, time: '17:30', title: 'Devoirs et révisions des cours du jour', done: false },
-                { id: 3, time: '21:30', title: 'Extinction des écrans avant de dormir', done: false }
-            ],
-            'lycee': [
-                { id: 1, time: '07:15', title: 'Routine matinale & organisation', done: true },
-                { id: 2, time: '18:00', title: 'Session de travail approfondi (45 min)', done: false },
-                { id: 3, time: '22:00', title: 'Préparation de la journée de demain', done: false }
-            ],
-            'default': [
-                { id: 1, time: '08:00', title: 'Planification des 3 priorités du jour', done: true },
-                { id: 2, time: '14:00', title: 'Session de concentration (Deep Work)', done: false },
-                { id: 3, time: '18:30', title: 'Activité physique ou détente', done: false }
-            ]
-        };
+        // Exemples pré-remplis à la première ouverture
+        const starterSlots = [
+            { id: 101, day: 0, start: '08:00', end: '10:00', title: 'Mathématiques', room: 'Salle 204', category: 'cours' },
+            { id: 102, day: 0, start: '10:15', end: '12:00', title: 'Histoire-Géo', room: 'Salle 108', category: 'cours' },
+            { id: 103, day: 0, start: '17:30', end: '18:30', title: 'Devoirs & Fiches', room: 'Maison', category: 'revisions' },
+            { id: 104, day: 1, start: '09:00', end: '11:00', title: 'Français / Littérature', room: 'Salle 112', category: 'cours' },
+            { id: 105, day: 2, start: '14:00', end: '16:00', title: 'Entraînement Sport', room: 'Gymnase', category: 'sport' },
+            { id: 106, day: 3, start: '08:00', end: '10:00', title: 'Sciences / SVT', room: 'Labo 2', category: 'cours' },
+            { id: 107, day: 4, start: '16:30', end: '18:00', title: 'Bilan de la semaine', room: 'Maison', category: 'routine' }
+        ];
 
         function calculateAge(birthDateString) {
             const today = new Date();
@@ -627,7 +929,6 @@
             return age;
         }
 
-        // Vérification automatique de la session au chargement
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
@@ -666,7 +967,6 @@
             }
         }
 
-        // Étape 1 : Connexion ou Inscription
         async function handleAuthSubmit(event) {
             event.preventDefault();
             hideBanner('auth-banner');
@@ -681,12 +981,10 @@
 
             try {
                 if (isLoginMode) {
-                    // CONNEXION -> Va directement vérifier le profil et ouvrir le Dashboard
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (error) throw error;
                     await routeUserAfterAuth(data.user);
                 } else {
-                    // INSCRIPTION -> Crée le compte et envoie vers la complétion du profil
                     const { data, error } = await supabaseClient.auth.signUp({
                         email,
                         password,
@@ -709,7 +1007,6 @@
             }
         }
 
-        // Aiguillage intelligent après connexion
         async function routeUserAfterAuth(user) {
             currentUser = user;
             const { data: profile } = await supabaseClient
@@ -719,10 +1016,8 @@
                 .single();
 
             if (profile) {
-                // Profil complet -> Directement sur la page d'accueil (Dashboard)
                 showDashboardView(user, profile);
             } else {
-                // Profil non terminé -> Passage par la page de complétion
                 showOnboardingView();
             }
         }
@@ -756,7 +1051,6 @@
             }
         }
 
-        // Étape 2 : Validation du profil -> Redirection vers le Dashboard
         async function handleProfileSubmit(event) {
             event.preventDefault();
             hideBanner('onboarding-banner');
@@ -791,8 +1085,6 @@
                     .insert([newProfile]);
 
                 if (error) throw error;
-
-                // Une fois le profil enregistré -> Ouverture du Dashboard
                 showDashboardView(currentUser, newProfile);
             } catch (err) {
                 showBanner('onboarding-banner', "Erreur lors de l'enregistrement : " + err.message, 'error');
@@ -802,56 +1094,210 @@
             }
         }
 
-        // --- LOGIQUE DU DASHBOARD (VUE 3) ---
+        // --- DASHBOARD & EMPLOI DU TEMPS ---
         function showDashboardView(user, profile) {
             document.body.classList.add('dashboard-active');
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('onboarding-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
 
-            // Personnalisation de l'en-tête
             const age = calculateAge(profile.birth_date);
             const sitLabel = situationLabels[profile.situation] || profile.situation;
             document.getElementById('dash-welcome').textContent = `Bonjour, ${profile.full_name} 👋`;
             document.getElementById('dash-badge').textContent = `${sitLabel} • ${age} ans`;
 
-            // Date du jour formatée en français
             const optionsDate = { weekday: 'short', day: 'numeric', month: 'short' };
             const todayStr = new Date().toLocaleDateString('fr-FR', optionsDate);
             document.getElementById('stat-date').textContent = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
 
-            // Chargement des routines de l'utilisateur (sauvegardées par ID utilisateur)
-            const storageKey = `tempo_routines_${user.id}`;
-            const saved = localStorage.getItem(storageKey);
-            if (saved) {
-                routines = JSON.parse(saved);
+            // Chargement des créneaux de l'emploi du temps
+            const slotsKey = `tempo_slots_${user.id}`;
+            const savedSlots = localStorage.getItem(slotsKey);
+            if (savedSlots) {
+                timetableSlots = JSON.parse(savedSlots);
             } else {
-                routines = defaultRoutinesBySituation[profile.situation] || defaultRoutinesBySituation['default'];
-                saveRoutines();
+                timetableSlots = [...starterSlots];
+                saveSlotsData();
             }
 
+            // Chargement des habitudes du jour
+            const routinesKey = `tempo_routines_${user.id}`;
+            const savedRoutines = localStorage.getItem(routinesKey);
+            if (savedRoutines) {
+                dailyRoutines = JSON.parse(savedRoutines);
+            } else {
+                dailyRoutines = [
+                    { id: 1, title: 'Préparer mes affaires pour demain', done: false },
+                    { id: 2, title: '30 minutes de lecture ou révisions', done: false }
+                ];
+                saveRoutinesData();
+            }
+
+            renderTimetable();
             renderRoutines();
         }
 
-        function saveRoutines() {
+        function saveSlotsData() {
             if (!currentUser) return;
-            localStorage.setItem(`tempo_routines_${currentUser.id}`, JSON.stringify(routines));
+            localStorage.setItem(`tempo_slots_${currentUser.id}`, JSON.stringify(timetableSlots));
         }
 
+        function saveRoutinesData() {
+            if (!currentUser) return;
+            localStorage.setItem(`tempo_routines_${currentUser.id}`, JSON.stringify(dailyRoutines));
+        }
+
+        // Convertit "08:30" en minutes depuis 07:00
+        function timeToOffsetMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return (h - START_HOUR) * 60 + m;
+        }
+
+        // Génération de la grille Pronote
+        function renderTimetable() {
+            const grid = document.getElementById('timetable-grid');
+            grid.innerHTML = '';
+
+            // Jour actuel (0 = Lundi ... 6 = Dimanche)
+            const jsDay = new Date().getDay();
+            const todayIndex = jsDay === 0 ? 6 : jsDay - 1;
+
+            // 1. Ligne d'en-tête
+            const corner = document.createElement('div');
+            corner.className = 'tt-header-corner';
+            grid.appendChild(corner);
+
+            DAYS.forEach((dayName, idx) => {
+                const header = document.createElement('div');
+                header.className = `tt-day-header ${idx === todayIndex ? 'today' : ''}`;
+                header.textContent = dayName;
+                grid.appendChild(header);
+            });
+
+            // 2. Colonne des heures (07h -> 21h)
+            const timeCol = document.createElement('div');
+            timeCol.className = 'tt-time-col';
+            for (let h = START_HOUR; h < END_HOUR; h++) {
+                const slot = document.createElement('div');
+                slot.className = 'tt-time-slot';
+                slot.textContent = `${h.toString().padStart(2, '0')}:00`;
+                timeCol.appendChild(slot);
+            }
+            grid.appendChild(timeCol);
+
+            // 3. Colonnes des 7 jours
+            for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+                const dayCol = document.createElement('div');
+                dayCol.className = `tt-day-col ${dayIdx === todayIndex ? 'today' : ''}`;
+
+                // Clic rapide dans le vide d'un jour pour pré-remplir la modale
+                dayCol.addEventListener('click', (e) => {
+                    if (e.target === dayCol) {
+                        const rect = dayCol.getBoundingClientRect();
+                        const clickY = e.clientY - rect.top;
+                        const clickedHour = Math.min(20, Math.max(START_HOUR, START_HOUR + Math.floor(clickY / HOUR_HEIGHT)));
+                        openSlotModal(dayIdx, `${clickedHour.toString().padStart(2, '0')}:00`);
+                    }
+                });
+
+                const dayEvents = timetableSlots.filter(s => s.day === dayIdx);
+                dayEvents.forEach(ev => {
+                    const startMins = Math.max(0, timeToOffsetMinutes(ev.start));
+                    const endMins = Math.min((END_HOUR - START_HOUR) * 60, timeToOffsetMinutes(ev.end));
+                    const durationMins = Math.max(30, endMins - startMins);
+
+                    const topPx = (startMins / 60) * HOUR_HEIGHT;
+                    const heightPx = (durationMins / 60) * HOUR_HEIGHT - 2;
+
+                    const evEl = document.createElement('div');
+                    evEl.className = `tt-event cat-${ev.category}`;
+                    evEl.style.top = `${topPx}px`;
+                    evEl.style.height = `${heightPx}px`;
+
+                    evEl.innerHTML = `
+                        <div class="tt-event-top">
+                            <span class="tt-event-title">${ev.title}</span>
+                            <button class="tt-event-del" onclick="deleteSlot(event, ${ev.id})" title="Supprimer">✕</button>
+                        </div>
+                        <div class="tt-event-meta">${ev.start} - ${ev.end}${ev.room ? ' • ' + ev.room : ''}</div>
+                    `;
+                    dayCol.appendChild(evEl);
+                });
+
+                grid.appendChild(dayCol);
+            }
+
+            updateDashboardStats();
+        }
+
+        // Modale d'ajout de créneau
+        function openSlotModal(day = 0, startTime = '08:00') {
+            document.getElementById('slot-day').value = day;
+            document.getElementById('slot-start').value = startTime;
+            const [h, m] = startTime.split(':').map(Number);
+            const endH = Math.min(22, h + 1);
+            document.getElementById('slot-end').value = `${endH.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            document.getElementById('slot-title').value = '';
+            document.getElementById('slot-room').value = '';
+            document.getElementById('slot-modal').classList.remove('hidden');
+            document.getElementById('slot-title').focus();
+        }
+
+        function closeSlotModal() {
+            document.getElementById('slot-modal').classList.add('hidden');
+        }
+
+        function closeSlotModalOnBackdrop(e) {
+            if (e.target.id === 'slot-modal') closeSlotModal();
+        }
+
+        function saveTimetableSlot(event) {
+            event.preventDefault();
+            const title = document.getElementById('slot-title').value.trim();
+            const room = document.getElementById('slot-room').value.trim();
+            const day = parseInt(document.getElementById('slot-day').value, 10);
+            const start = document.getElementById('slot-start').value;
+            const end = document.getElementById('slot-end').value;
+            const category = document.getElementById('slot-category').value;
+
+            if (end <= start) {
+                alert("L'heure de fin doit être après l'heure de début.");
+                return;
+            }
+
+            timetableSlots.push({
+                id: Date.now(),
+                day,
+                start,
+                end,
+                title,
+                room,
+                category
+            });
+
+            saveSlotsData();
+            renderTimetable();
+            closeSlotModal();
+        }
+
+        function deleteSlot(event, id) {
+            event.stopPropagation();
+            timetableSlots = timetableSlots.filter(s => s.id !== id);
+            saveSlotsData();
+            renderTimetable();
+        }
+
+        // --- HABITUDES QUOTIDIENNES ---
         function renderRoutines() {
             const listEl = document.getElementById('routine-list');
             listEl.innerHTML = '';
 
-            // Tri chronologique par heure
-            routines.sort((a, b) => a.time.localeCompare(b.time));
-
-            routines.forEach(item => {
+            dailyRoutines.forEach(item => {
                 const div = document.createElement('div');
                 div.className = `routine-item ${item.done ? 'completed' : ''}`;
                 div.innerHTML = `
                     <div class="routine-left">
                         <input type="checkbox" class="routine-checkbox" ${item.done ? 'checked' : ''} onchange="toggleRoutine(${item.id})">
-                        <span class="routine-time">${item.time}</span>
                         <span class="routine-title">${item.title}</span>
                     </div>
                     <button class="delete-btn" onclick="deleteRoutine(${item.id})" title="Supprimer">✕</button>
@@ -859,57 +1305,54 @@
                 listEl.appendChild(div);
             });
 
-            updateStats();
+            updateDashboardStats();
         }
 
         function addRoutine(event) {
             event.preventDefault();
-            const timeInput = document.getElementById('routine-time');
-            const titleInput = document.getElementById('routine-title');
+            const input = document.getElementById('routine-title');
+            if (!input.value.trim()) return;
 
-            if (!titleInput.value.trim()) return;
-
-            routines.push({
+            dailyRoutines.push({
                 id: Date.now(),
-                time: timeInput.value,
-                title: titleInput.value.trim(),
+                title: input.value.trim(),
                 done: false
             });
 
-            titleInput.value = '';
-            saveRoutines();
+            input.value = '';
+            saveRoutinesData();
             renderRoutines();
         }
 
         function toggleRoutine(id) {
-            const routine = routines.find(r => r.id === id);
-            if (routine) {
-                routine.done = !routine.done;
-                saveRoutines();
+            const r = dailyRoutines.find(x => x.id === id);
+            if (r) {
+                r.done = !r.done;
+                saveRoutinesData();
                 renderRoutines();
             }
         }
 
         function deleteRoutine(id) {
-            routines = routines.filter(r => r.id !== id);
-            saveRoutines();
+            dailyRoutines = dailyRoutines.filter(x => x.id !== id);
+            saveRoutinesData();
             renderRoutines();
         }
 
-        function updateStats() {
-            const total = routines.length;
-            const doneCount = routines.filter(r => r.done).length;
+        function updateDashboardStats() {
+            document.getElementById('stat-slots').textContent = timetableSlots.length;
+
+            const total = dailyRoutines.length;
+            const doneCount = dailyRoutines.filter(r => r.done).length;
             const percent = total === 0 ? 0 : Math.round((doneCount / total) * 100);
 
-            document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-percent').textContent = `${percent}%`;
-            document.getElementById('stat-done-text').textContent = `${doneCount} terminée${doneCount > 1 ? 's' : ''}`;
+            document.getElementById('stat-done-text').textContent = `${doneCount}/${total} accompli${doneCount > 1 ? 's' : ''}`;
         }
 
         async function logout() {
             await supabaseClient.auth.signOut();
             currentUser = null;
-            routines = [];
             document.body.classList.remove('dashboard-active');
             document.getElementById('auth-form').reset();
             document.getElementById('onboarding-form').reset();
