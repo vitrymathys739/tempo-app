@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tempo - Mon Espace</title>
+    <title>Tempo - Tableau de bord</title>
 
     <!-- Balises PWA / iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,6 +18,7 @@
         :root {
             --bg-color: #09090b;
             --card-bg: #18181b;
+            --card-hover: #202024;
             --text-color: #f4f4f5;
             --text-muted: #a1a1aa;
             --accent: #3b82f6;
@@ -27,19 +28,29 @@
             --border: #27272a;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             padding: 16px;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
         }
 
+        /* Mode aligné en haut quand on est sur le Dashboard */
+        body.dashboard-active {
+            align-items: flex-start;
+            padding-top: 24px;
+        }
+
+        /* --- CONTENEURS AUTH & ONBOARDING --- */
         .card-container {
             width: 100%;
             max-width: 420px;
@@ -47,7 +58,6 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 16px;
-            box-sizing: border-box;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
@@ -119,6 +129,7 @@
         input[type="email"],
         input[type="password"],
         input[type="date"],
+        input[type="time"],
         select {
             background: var(--bg-color);
             border: 1px solid var(--border);
@@ -182,7 +193,6 @@
             font-size: 0.95rem;
             cursor: pointer;
             transition: background 0.2s;
-            margin-top: 4px;
             width: 100%;
         }
 
@@ -204,57 +214,221 @@
 
         .secondary-btn:hover {
             border-color: var(--text-muted);
-            background: #202024;
+            background: var(--card-hover);
         }
 
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin: 16px 0 4px 0;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .divider span {
-            padding: 0 10px;
-        }
-
-        .profile-summary {
-            background: var(--bg-color);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px;
-            margin: 16px 0;
-            text-align: left;
-            font-size: 0.9rem;
+        /* --- VUE 3 : DASHBOARD GLOBAL --- */
+        .dashboard-container {
+            width: 100%;
+            max-width: 820px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 20px;
         }
 
-        .success-view {
-            text-align: center;
-            padding: 8px 0;
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 16px 24px;
+            border-radius: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .success-icon {
-            width: 52px;
-            height: 52px;
-            background: rgba(16, 185, 129, 0.15);
+        .user-greeting h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .user-badge {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.12);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .logout-small-btn {
+            background: var(--bg-color);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-small-btn:hover {
+            color: var(--text-color);
+            border-color: var(--text-muted);
+        }
+
+        /* Grille des statistiques */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .stat-sub {
+            font-size: 0.8rem;
             color: var(--success);
-            border-radius: 50%;
+        }
+
+        /* Section Routines */
+        .routines-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .panel-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .add-routine-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .add-routine-bar input[type="time"] {
+            width: 115px;
+        }
+
+        .add-routine-bar input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .add-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 20px;
+            height: 44px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .add-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .routine-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .routine-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 14px auto;
+            justify-content: space-between;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .routine-item.completed {
+            opacity: 0.6;
+        }
+
+        .routine-item.completed .routine-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .routine-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .routine-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--success);
+            cursor: pointer;
+        }
+
+        .routine-time {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.12);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .routine-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .delete-btn:hover {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
         }
 
         .hidden {
@@ -264,11 +438,11 @@
 </head>
 <body>
 
-    <!-- VUE 1 : Connexion / Inscription rapide -->
+    <!-- VUE 1 : Connexion / Inscription -->
     <div class="card-container" id="auth-view">
         <div class="logo-area">
             <h1>Tempo</h1>
-            <p id="subtitle">Connecte-toi pour gérer tes routines</p>
+            <p id="subtitle">Connecte-toi pour accéder à ton espace</p>
         </div>
 
         <div class="auth-tabs">
@@ -297,26 +471,19 @@
             <div class="rgpd-box hidden" id="rgpd-group">
                 <input type="checkbox" id="rgpd-consent">
                 <label for="rgpd-consent" style="cursor: pointer;">
-                    J'accepte que mes données soient hébergées en Europe (UE) conformément au RGPD pour faire fonctionner mon compte Tempo.
+                    J'accepte que mes données soient hébergées en Europe (UE) conformément au RGPD pour le fonctionnement de mon compte Tempo.
                 </label>
             </div>
 
             <button type="submit" class="submit-btn" id="auth-submit-btn">Se connecter</button>
         </form>
-
-        <div id="passkey-login-section">
-            <div class="divider"><span>ou</span></div>
-            <button type="button" class="submit-btn secondary-btn" onclick="loginWithPasskey()">
-                🔑 Continuer avec une Passkey
-            </button>
-        </div>
     </div>
 
-    <!-- VUE 2 : Compléter le profil (S'affiche après création de compte) -->
+    <!-- VUE 2 : Compléter le profil (Uniquement après création de compte) -->
     <div class="card-container hidden" id="onboarding-view">
         <div class="logo-area">
             <h1>Complétez votre profil</h1>
-            <p>Ces informations permettent d'adapter Tempo à ton rythme</p>
+            <p>Dernière étape avant d'accéder à ton tableau de bord</p>
         </div>
 
         <div id="onboarding-banner" class="banner error-banner hidden"></div>
@@ -327,11 +494,11 @@
                 <input type="date" id="birth-date" required onchange="checkAgeRequirement()">
             </div>
 
-            <!-- Case accord parental affichée uniquement entre 10 et 14 ans (RGPD France) -->
+            <!-- Accord parental si 10-14 ans -->
             <div class="rgpd-box hidden" id="parental-group">
                 <input type="checkbox" id="parental-consent">
                 <label for="parental-consent" style="cursor: pointer;">
-                    Ayant moins de 15 ans, je confirme avoir l'autorisation d'un parent ou tuteur légal pour créer mon compte Tempo.
+                    Ayant moins de 15 ans, je confirme avoir l'autorisation d'un parent ou tuteur légal pour utiliser Tempo.
                 </label>
             </div>
 
@@ -350,32 +517,58 @@
                 </select>
             </div>
 
-            <button type="submit" class="submit-btn" id="profile-submit-btn">Terminer l'inscription</button>
+            <button type="submit" class="submit-btn" id="profile-submit-btn">Accéder à mon espace</button>
         </form>
 
         <button type="button" class="submit-btn secondary-btn" onclick="logout()">Annuler et se déconnecter</button>
     </div>
 
-    <!-- VUE 3 : Connexion Réussie & Sécurité -->
-    <div class="card-container success-view hidden" id="success-view">
-        <div class="success-icon">✓</div>
-        <h1>Connexion Réussie</h1>
-        <p id="welcome-user" style="margin-top: 6px;">Bienvenue sur Tempo !</p>
+    <!-- VUE 3 : PAGE D'ACCUEIL & DASHBOARD GLOBAL -->
+    <div class="dashboard-container hidden" id="dashboard-view">
+        <!-- Barre supérieure -->
+        <header class="topbar">
+            <div class="user-greeting">
+                <h2 id="dash-welcome">Bonjour !</h2>
+                <span class="user-badge" id="dash-badge">Profil Tempo</span>
+            </div>
+            <button class="logout-small-btn" onclick="logout()">Se déconnecter</button>
+        </header>
 
-        <div id="success-banner" class="banner info-banner hidden" style="margin-top: 14px;"></div>
+        <!-- Cartes de statistiques globales -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Routines du jour</span>
+                <span class="stat-value" id="stat-total">0</span>
+                <span class="stat-sub">Planifiées aujourd'hui</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Progression</span>
+                <span class="stat-value" id="stat-percent">0%</span>
+                <span class="stat-sub" id="stat-done-text">0 terminée</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Date du jour</span>
+                <span class="stat-value" id="stat-date" style="font-size: 1.35rem; margin-top: 4px;">-</span>
+                <span class="stat-sub">Rythme actif</span>
+            </div>
+        </section>
 
-        <div class="profile-summary">
-            <div><strong>Email :</strong> <span id="prof-email">-</span></div>
-            <div><strong>Profil :</strong> <span id="prof-name">-</span></div>
-            <div><strong>Âge :</strong> <span id="prof-age">-</span></div>
-            <div><strong>Situation :</strong> <span id="prof-situation">-</span></div>
-        </div>
+        <!-- Gestionnaire de routines -->
+        <section class="routines-panel">
+            <div class="panel-header">
+                <h3>Mon programme du jour</h3>
+            </div>
 
-        <button class="submit-btn" onclick="registerPasskey()">
-            🛡️ Créer une Passkey sur cet appareil
-        </button>
+            <form class="add-routine-bar" onsubmit="addRoutine(event)">
+                <input type="time" id="routine-time" value="08:00" required>
+                <input type="text" id="routine-title" placeholder="Ajouter une routine (ex: Révisions, Sport, Lecture...)" required>
+                <button type="submit" class="add-btn">+ Ajouter</button>
+            </form>
 
-        <button class="submit-btn secondary-btn" onclick="logout()">Se déconnecter</button>
+            <div class="routine-list" id="routine-list">
+                <!-- Les routines s'affichent ici -->
+            </div>
+        </section>
     </div>
 
     <script>
@@ -391,6 +584,7 @@
 
         let isLoginMode = true;
         let currentUser = null;
+        let routines = [];
 
         const situationLabels = {
             'college': 'Étudiant au collège',
@@ -403,7 +597,25 @@
             'autre': 'Autre situation'
         };
 
-        // Calcul précis de l'âge en années
+        // Routines suggérées par défaut lors de la première visite selon la situation
+        const defaultRoutinesBySituation = {
+            'college': [
+                { id: 1, time: '07:30', title: 'Préparation du sac et petit-déjeuner', done: true },
+                { id: 2, time: '17:30', title: 'Devoirs et révisions des cours du jour', done: false },
+                { id: 3, time: '21:30', title: 'Extinction des écrans avant de dormir', done: false }
+            ],
+            'lycee': [
+                { id: 1, time: '07:15', title: 'Routine matinale & organisation', done: true },
+                { id: 2, time: '18:00', title: 'Session de travail approfondi (45 min)', done: false },
+                { id: 3, time: '22:00', title: 'Préparation de la journée de demain', done: false }
+            ],
+            'default': [
+                { id: 1, time: '08:00', title: 'Planification des 3 priorités du jour', done: true },
+                { id: 2, time: '14:00', title: 'Session de concentration (Deep Work)', done: false },
+                { id: 3, time: '18:30', title: 'Activité physique ou détente', done: false }
+            ]
+        };
+
         function calculateAge(birthDateString) {
             const today = new Date();
             const birthDate = new Date(birthDateString);
@@ -415,7 +627,7 @@
             return age;
         }
 
-        // Vérifie la session au chargement de l'app
+        // Vérification automatique de la session au chargement
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
@@ -429,7 +641,6 @@
             const nameGroup = document.getElementById('name-group');
             const rgpdGroup = document.getElementById('rgpd-group');
             const rgpdConsent = document.getElementById('rgpd-consent');
-            const passkeySection = document.getElementById('passkey-login-section');
             const submitBtn = document.getElementById('auth-submit-btn');
             const subtitle = document.getElementById('subtitle');
             hideBanner('auth-banner');
@@ -440,24 +651,22 @@
                 registerTab.classList.remove('active');
                 nameGroup.classList.add('hidden');
                 rgpdGroup.classList.add('hidden');
-                passkeySection.classList.remove('hidden');
                 rgpdConsent.required = false;
                 submitBtn.textContent = "Se connecter";
-                subtitle.textContent = "Connecte-toi pour gérer tes routines";
+                subtitle.textContent = "Connecte-toi pour accéder à ton espace";
             } else {
                 isLoginMode = false;
                 registerTab.classList.add('active');
                 loginTab.classList.remove('active');
                 nameGroup.classList.remove('hidden');
                 rgpdGroup.classList.remove('hidden');
-                passkeySection.classList.add('hidden');
                 rgpdConsent.required = true;
                 submitBtn.textContent = "Continuer";
                 subtitle.textContent = "Crée ton compte Tempo en quelques secondes";
             }
         }
 
-        // Étape 1 : Connexion ou création du compte Auth
+        // Étape 1 : Connexion ou Inscription
         async function handleAuthSubmit(event) {
             event.preventDefault();
             hideBanner('auth-banner');
@@ -472,10 +681,12 @@
 
             try {
                 if (isLoginMode) {
+                    // CONNEXION -> Va directement vérifier le profil et ouvrir le Dashboard
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (error) throw error;
                     await routeUserAfterAuth(data.user);
                 } else {
+                    // INSCRIPTION -> Crée le compte et envoie vers la complétion du profil
                     const { data, error } = await supabaseClient.auth.signUp({
                         email,
                         password,
@@ -484,9 +695,10 @@
                     if (error) throw error;
 
                     if (data.user && data.session) {
-                        await routeUserAfterAuth(data.user);
+                        currentUser = data.user;
+                        showOnboardingView();
                     } else {
-                        showBanner('auth-banner', "Compte créé ! Vérifie tes emails pour valider ton adresse avant de continuer.", 'info');
+                        showBanner('auth-banner', "Compte créé ! Vérifie tes emails pour valider ton adresse avant de te connecter.", 'info');
                     }
                 }
             } catch (error) {
@@ -497,7 +709,7 @@
             }
         }
 
-        // Aiguillage : si le profil existe -> Vue 3, sinon -> Vue 2 (Complétez votre profil)
+        // Aiguillage intelligent après connexion
         async function routeUserAfterAuth(user) {
             currentUser = user;
             const { data: profile } = await supabaseClient
@@ -506,17 +718,22 @@
                 .eq('id', user.id)
                 .single();
 
-            document.getElementById('auth-view').classList.add('hidden');
-
             if (profile) {
-                showSuccessView(user, profile);
+                // Profil complet -> Directement sur la page d'accueil (Dashboard)
+                showDashboardView(user, profile);
             } else {
-                document.getElementById('success-view').classList.add('hidden');
-                document.getElementById('onboarding-view').classList.remove('hidden');
+                // Profil non terminé -> Passage par la page de complétion
+                showOnboardingView();
             }
         }
 
-        // Vérification dynamique de l'âge à la saisie de la date
+        function showOnboardingView() {
+            document.body.classList.remove('dashboard-active');
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('onboarding-view').classList.remove('hidden');
+        }
+
         function checkAgeRequirement() {
             const birthDateVal = document.getElementById('birth-date').value;
             const parentalGroup = document.getElementById('parental-group');
@@ -539,7 +756,7 @@
             }
         }
 
-        // Étape 2 : Enregistrement des infos de profil
+        // Étape 2 : Validation du profil -> Redirection vers le Dashboard
         async function handleProfileSubmit(event) {
             event.preventDefault();
             hideBanner('onboarding-banner');
@@ -551,14 +768,13 @@
 
             const age = calculateAge(birthDate);
 
-            // Blocage strict des moins de 10 ans
             if (age < 10) {
                 showBanner('onboarding-banner', "Inscription refusée : tu dois avoir au moins 10 ans pour utiliser Tempo.", 'error');
                 return;
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = "Enregistrement...";
+            submitBtn.textContent = "Création de votre espace...";
 
             try {
                 const fullName = currentUser.user_metadata?.full_name || 'Utilisateur Tempo';
@@ -576,73 +792,130 @@
 
                 if (error) throw error;
 
-                document.getElementById('onboarding-view').classList.add('hidden');
-                showSuccessView(currentUser, newProfile);
+                // Une fois le profil enregistré -> Ouverture du Dashboard
+                showDashboardView(currentUser, newProfile);
             } catch (err) {
                 showBanner('onboarding-banner', "Erreur lors de l'enregistrement : " + err.message, 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = "Terminer l'inscription";
+                submitBtn.textContent = "Accéder à mon espace";
             }
         }
 
-        function showSuccessView(user, profile) {
-            document.getElementById('success-view').classList.remove('hidden');
+        // --- LOGIQUE DU DASHBOARD (VUE 3) ---
+        function showDashboardView(user, profile) {
+            document.body.classList.add('dashboard-active');
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('onboarding-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+
+            // Personnalisation de l'en-tête
             const age = calculateAge(profile.birth_date);
+            const sitLabel = situationLabels[profile.situation] || profile.situation;
+            document.getElementById('dash-welcome').textContent = `Bonjour, ${profile.full_name} 👋`;
+            document.getElementById('dash-badge').textContent = `${sitLabel} • ${age} ans`;
 
-            document.getElementById('welcome-user').textContent = `Bienvenue, ${profile.full_name} !`;
-            document.getElementById('prof-email').textContent = user.email;
-            document.getElementById('prof-name').textContent = profile.full_name;
-            document.getElementById('prof-age').textContent = `${age} ans`;
-            document.getElementById('prof-situation').textContent = situationLabels[profile.situation] || profile.situation;
+            // Date du jour formatée en français
+            const optionsDate = { weekday: 'short', day: 'numeric', month: 'short' };
+            const todayStr = new Date().toLocaleDateString('fr-FR', optionsDate);
+            document.getElementById('stat-date').textContent = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
+
+            // Chargement des routines de l'utilisateur (sauvegardées par ID utilisateur)
+            const storageKey = `tempo_routines_${user.id}`;
+            const saved = localStorage.getItem(storageKey);
+            if (saved) {
+                routines = JSON.parse(saved);
+            } else {
+                routines = defaultRoutinesBySituation[profile.situation] || defaultRoutinesBySituation['default'];
+                saveRoutines();
+            }
+
+            renderRoutines();
         }
 
-        // --- PASSKEYS ---
-        async function registerPasskey() {
-            hideBanner('success-banner');
-            try {
-                if (!window.PublicKeyCredential) {
-                    throw new Error("Ton navigateur ne supporte pas les Passkeys.");
-                }
-                const { error } = await supabaseClient.auth.mfa.enroll({
-                    factorType: 'webauthn',
-                    friendlyName: 'Appareil Tempo (' + navigator.platform + ')'
-                });
-                if (error) throw error;
-                showBanner('success-banner', "✅ Passkey enregistrée avec succès sur cet appareil !", 'info');
-            } catch (err) {
-                showBanner('success-banner', "Erreur Passkey : " + err.message, 'error');
+        function saveRoutines() {
+            if (!currentUser) return;
+            localStorage.setItem(`tempo_routines_${currentUser.id}`, JSON.stringify(routines));
+        }
+
+        function renderRoutines() {
+            const listEl = document.getElementById('routine-list');
+            listEl.innerHTML = '';
+
+            // Tri chronologique par heure
+            routines.sort((a, b) => a.time.localeCompare(b.time));
+
+            routines.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `routine-item ${item.done ? 'completed' : ''}`;
+                div.innerHTML = `
+                    <div class="routine-left">
+                        <input type="checkbox" class="routine-checkbox" ${item.done ? 'checked' : ''} onchange="toggleRoutine(${item.id})">
+                        <span class="routine-time">${item.time}</span>
+                        <span class="routine-title">${item.title}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteRoutine(${item.id})" title="Supprimer">✕</button>
+                `;
+                listEl.appendChild(div);
+            });
+
+            updateStats();
+        }
+
+        function addRoutine(event) {
+            event.preventDefault();
+            const timeInput = document.getElementById('routine-time');
+            const titleInput = document.getElementById('routine-title');
+
+            if (!titleInput.value.trim()) return;
+
+            routines.push({
+                id: Date.now(),
+                time: timeInput.value,
+                title: titleInput.value.trim(),
+                done: false
+            });
+
+            titleInput.value = '';
+            saveRoutines();
+            renderRoutines();
+        }
+
+        function toggleRoutine(id) {
+            const routine = routines.find(r => r.id === id);
+            if (routine) {
+                routine.done = !routine.done;
+                saveRoutines();
+                renderRoutines();
             }
         }
 
-        async function loginWithPasskey() {
-            hideBanner('auth-banner');
-            const email = document.getElementById('email').value.trim();
-            if (!email) {
-                showBanner('auth-banner', "Saisis d'abord ton adresse email ci-dessus pour utiliser ta Passkey.", 'error');
-                return;
-            }
-            try {
-                if (!window.PublicKeyCredential) {
-                    throw new Error("Les Passkeys ne sont pas supportées sur cet appareil.");
-                }
-                const { data, error } = await supabaseClient.auth.signInWithWebAuthn({ email });
-                if (error) throw error;
-                if (data.user) await routeUserAfterAuth(data.user);
-            } catch (err) {
-                showBanner('auth-banner', "Connexion Passkey impossible : " + err.message, 'error');
-            }
+        function deleteRoutine(id) {
+            routines = routines.filter(r => r.id !== id);
+            saveRoutines();
+            renderRoutines();
+        }
+
+        function updateStats() {
+            const total = routines.length;
+            const doneCount = routines.filter(r => r.done).length;
+            const percent = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-percent').textContent = `${percent}%`;
+            document.getElementById('stat-done-text').textContent = `${doneCount} terminée${doneCount > 1 ? 's' : ''}`;
         }
 
         async function logout() {
             await supabaseClient.auth.signOut();
             currentUser = null;
+            routines = [];
+            document.body.classList.remove('dashboard-active');
             document.getElementById('auth-form').reset();
             document.getElementById('onboarding-form').reset();
             hideBanner('auth-banner');
             hideBanner('onboarding-banner');
-            hideBanner('success-banner');
-            document.getElementById('success-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('onboarding-view').classList.add('hidden');
             document.getElementById('auth-view').classList.remove('hidden');
         }
