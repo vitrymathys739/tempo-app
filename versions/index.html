@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tempo - Connexion</title>
+
+    <!-- Balises PWA / iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tempo">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="css/base.css">
+
+    <!-- SDK Officiel Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/shared.js" defer></script>
+    <script src="js/login.js" defer></script>
+</head>
+<body>
+
+    <!-- Connexion / Inscription -->
+    <div class="card-container" id="auth-view">
+        <div class="logo-area">
+            <h1>Tempo</h1>
+            <p id="subtitle">Connecte-toi pour accéder à ton espace</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="tab-btn active" id="login-tab" onclick="switchMode('login')">Connexion</button>
+            <button class="tab-btn" id="register-tab" onclick="switchMode('register')">Inscription</button>
+        </div>
+
+        <div id="auth-banner" class="banner error-banner hidden"></div>
+
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+            <div class="form-group hidden" id="name-group">
+                <label for="name">Prénom ou Pseudo</label>
+                <input type="text" id="name" placeholder="Ex: Alex">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Adresse email</label>
+                <input type="email" id="email" required placeholder="nom@exemple.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe (6 caractères min.)</label>
+                <input type="password" id="password" required minlength="6" placeholder="••••••••">
+            </div>
+
+            <div class="rgpd-box hidden" id="rgpd-group">
+                <input type="checkbox" id="rgpd-consent">
+                <label for="rgpd-consent" style="cursor: pointer;">
+                    J'accepte que mes données soient hébergées en Europe (UE) conformément au RGPD pour le fonctionnement de mon compte Tempo.
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn" id="auth-submit-btn">Se connecter</button>
+        </form>
+    </div>
+
+</body>
+</html>

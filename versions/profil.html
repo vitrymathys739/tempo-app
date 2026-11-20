@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tempo - Compléter mon profil</title>
+
+    <!-- Balises PWA / iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tempo">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="css/base.css">
+
+    <!-- SDK Officiel Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/shared.js" defer></script>
+    <script src="js/profil.js" defer></script>
+</head>
+<body class="pending">
+
+    <!-- Compléter le profil -->
+    <div class="card-container" id="onboarding-view">
+        <div class="logo-area">
+            <h1>Complétez votre profil</h1>
+            <p>Dernière étape avant d'accéder à ton emploi du temps</p>
+        </div>
+
+        <div id="onboarding-banner" class="banner error-banner hidden"></div>
+
+        <form id="onboarding-form" onsubmit="handleProfileSubmit(event)">
+            <div class="form-group">
+                <label for="birth-date">Date de naissance (10 ans minimum)</label>
+                <input type="date" id="birth-date" required onchange="checkAgeRequirement()">
+            </div>
+
+            <div class="rgpd-box hidden" id="parental-group">
+                <input type="checkbox" id="parental-consent">
+                <label for="parental-consent" style="cursor: pointer;">
+                    Ayant moins de 15 ans, je confirme avoir l'autorisation d'un parent ou tuteur légal pour utiliser Tempo.
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="situation-select">Situation actuelle</label>
+                <select id="situation-select" required>
+                    <option value="">Sélectionne ta situation...</option>
+                    <option value="college">Étudiant au collège</option>
+                    <option value="lycee">Étudiant au lycée</option>
+                    <option value="superieur">Étudiant dans le supérieur (Fac, BTS, École...)</option>
+                    <option value="alternance">En alternance / Apprentissage</option>
+                    <option value="salarie">Salarié(e)</option>
+                    <option value="independant">Indépendant(e) / Entrepreneur</option>
+                    <option value="recherche">En recherche d'emploi / Reconversion</option>
+                    <option value="autre">Autre situation</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn" id="profile-submit-btn">Accéder à mon espace</button>
+        </form>
+
+        <button type="button" class="submit-btn secondary-btn" onclick="logout()">Annuler et se déconnecter</button>
+    </div>
+
+</body>
+</html>
