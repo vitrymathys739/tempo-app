@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tempo - Emploi du temps & Routines</title>
+
+    <!-- Balises PWA / iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tempo">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/accueil.css">
+    <!-- SDK Officiel Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/shared.js" defer></script>
+    <script src="js/accueil.js" defer></script>
+</head>
+<body class="dashboard-active pending">
+
+    <!-- DASHBOARD GLOBAL + EMPLOI DU TEMPS PRONOTE -->
+    <div class="dashboard-container" id="dashboard-view">
+        <!-- Barre supérieure -->
+        <header class="topbar">
+            <div class="user-greeting">
+                <h2 id="dash-welcome">Bonjour !</h2>
+                <span class="user-badge" id="dash-badge">Profil Tempo</span>
+            </div>
+            <div class="topbar-actions">
+                <button class="primary-small-btn" onclick="openSlotModal()">+ Ajouter un créneau</button>
+                <button class="logout-small-btn" onclick="logout()">Se déconnecter</button>
+            </div>
+        </header>
+
+        <!-- Cartes de synthèse -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Créneaux cette semaine</span>
+                <span class="stat-value" id="stat-slots">0</span>
+                <span class="stat-sub">Emploi du temps actif</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Objectifs du jour</span>
+                <span class="stat-value" id="stat-percent">0%</span>
+                <span class="stat-sub" id="stat-done-text">0/0 accompli</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Aujourd'hui</span>
+                <span class="stat-value" id="stat-date" style="font-size: 1.3rem; margin-top: 2px;">-</span>
+                <span class="stat-sub">Semaine en cours</span>
+            </div>
+        </section>
+
+        <!-- EMPLOI DU TEMPS HEBDOMADAIRE (CENTRE DU DASHBOARD) -->
+        <section class="timetable-panel">
+            <div class="panel-header">
+                <h3>📅 Emploi du temps hebdomadaire</h3>
+                <div class="panel-tools">
+                    <div class="legend" id="legend"></div>
+                    <button class="logout-small-btn" onclick="openCategoryModal()">🎨 Catégories</button>
+                </div>
+            </div>
+
+            <div class="timetable-scroll">
+                <div class="timetable-grid" id="timetable-grid">
+                    <!-- Généré dynamiquement en JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Checklist rapide des habitudes du jour -->
+        <section class="routines-panel">
+            <div class="panel-header">
+                <h3>✅ Mes habitudes quotidiennes</h3>
+            </div>
+
+            <form class="add-routine-bar" onsubmit="addRoutine(event)">
+                <input type="text" id="routine-title" placeholder="Ajouter une petite habitude (ex: Boire 1.5L d'eau, Lire 15 min...)" required>
+                <button type="submit" class="primary-small-btn">+ Ajouter</button>
+            </form>
+
+            <div class="routine-list" id="routine-list"></div>
+        </section>
+    </div>
+
+    <!-- MODALE : AJOUTER UN CRÉNEAU À L'EMPLOI DU TEMPS -->
+    <div class="modal-backdrop hidden" id="slot-modal" onclick="closeSlotModalOnBackdrop(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="slot-modal-title">Nouveau créneau</h3>
+                <button class="close-modal" onclick="closeSlotModal()">✕</button>
+            </div>
+
+            <form onsubmit="saveTimetableSlot(event)">
+                <div class="form-group">
+                    <label for="slot-title">Intitulé (Cours, Activité, Routine...)</label>
+                    <input type="text" id="slot-title" required placeholder="Ex: Mathématiques, Sport, Révisions...">
+                </div>
+
+                <div class="form-group">
+                    <label for="slot-room">Lieu / Détail (Optionnel)</label>
+                    <input type="text" id="slot-room" placeholder="Ex: Salle B12, Maison, Gymnase...">
+                </div>
+
+                <div class="form-group">
+                    <label for="slot-day">Jour de la semaine</label>
+                    <select id="slot-day" required>
+                        <option value="0">Lundi</option>
+                        <option value="1">Mardi</option>
+                        <option value="2">Mercredi</option>
+                        <option value="3">Jeudi</option>
+                        <option value="4">Vendredi</option>
+                        <option value="5">Samedi</option>
+                        <option value="6">Dimanche</option>
+                    </select>
+                </div>
+
+                <div class="time-row">
+                    <div class="form-group">
+                        <label for="slot-start">Début (07:00 min)</label>
+                        <input type="time" id="slot-start" value="08:00" min="07:00" max="21:30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slot-end">Fin (22:00 max)</label>
+                        <input type="time" id="slot-end" value="09:30" min="07:30" max="22:00" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Catégorie / Couleur</label>
+                    <input type="hidden" id="slot-category" value="">
+                    <div class="cat-chips" id="slot-category-chips"></div>
+                    <button type="button" class="link-btn" onclick="openCategoryModal()">⚙ Gérer les catégories et couleurs</button>
+                </div>
+
+                <button type="submit" class="submit-btn" id="slot-submit-btn">Ajouter à l'emploi du temps</button>
+                <button type="button" class="submit-btn danger-btn hidden" id="slot-delete-btn" onclick="deleteSlotFromModal()">Supprimer ce créneau</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODALE : CATÉGORIES & COULEURS -->
+    <div class="modal-backdrop modal-top hidden" id="category-modal" onclick="closeCategoryModalOnBackdrop(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Catégories &amp; couleurs</h3>
+                <button class="close-modal" onclick="closeCategoryModal()" aria-label="Fermer">✕</button>
+            </div>
+
+            <div class="category-list" id="category-list"></div>
+
+            <form class="category-form" onsubmit="saveCategory(event)">
+                <h4 id="category-form-title">Nouvelle catégorie</h4>
+                <div class="form-group">
+                    <label for="category-name">Nom</label>
+                    <input type="text" id="category-name" maxlength="30" required placeholder="Ex: Famille, Musique, Job étudiant...">
+                </div>
+                <div class="form-group">
+                    <label>Couleur</label>
+                    <div class="palette" id="category-palette"></div>
+                </div>
+                <button type="submit" class="submit-btn" id="category-submit-btn">Ajouter la catégorie</button>
+                <button type="button" class="submit-btn secondary-btn hidden" id="category-cancel-btn" onclick="resetCategoryForm()">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
