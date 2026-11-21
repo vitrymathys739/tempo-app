@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempo - Politique de confidentialité</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/legal.css">
+</head>
+<body class="legal-page">
+
+    <main class="legal-container">
+        <a class="back-link" href="index.html">← Retour à Tempo</a>
+
+        <h1>Politique de confidentialité</h1>
+        <p class="updated">Dernière mise à jour : 21 novembre 2026</p>
+
+        <p class="lead">
+            Tempo est une application d'emploi du temps et de routines. Cette page t'explique, simplement,
+            quelles données on collecte, pourquoi, où elles sont stockées et comment garder la main dessus.
+        </p>
+
+        <h2>1. Qui est responsable de tes données ?</h2>
+        <p>
+            Le responsable du traitement est <mark class="todo">[À COMPLÉTER : ton nom ou celui de ta structure]</mark>.
+            Pour toute question ou demande sur tes données, écris à
+            <mark class="todo">[À COMPLÉTER : adresse email de contact]</mark>.
+        </p>
+
+        <h2>2. Quelles données collectons-nous ?</h2>
+        <table>
+            <thead>
+                <tr><th>Donnée</th><th>Quand ?</th><th>Pourquoi ?</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Adresse email</td><td>Inscription</td><td>Créer ton compte et te connecter</td></tr>
+                <tr><td>Mot de passe</td><td>Inscription</td><td>Sécuriser ton compte (il n'est jamais stocké en clair)</td></tr>
+                <tr><td>Prénom ou pseudo</td><td>Inscription</td><td>Personnaliser l'application</td></tr>
+                <tr><td>Date de naissance</td><td>Complétion du profil</td><td>Vérifier l'âge minimum (10 ans) et l'autorisation parentale avant 15 ans</td></tr>
+                <tr><td>Situation (collège, lycée, études, emploi…)</td><td>Complétion du profil</td><td>Te proposer un modèle d'emploi du temps adapté</td></tr>
+                <tr><td>Autorisation parentale (oui / non)</td><td>Complétion du profil, si moins de 15 ans</td><td>Respecter la loi pour les jeunes utilisateurs</td></tr>
+                <tr><td>Adresse Gmail connectée, jeton d'accès chiffré, préférences d'affichage</td><td>Connexion Gmail (facultative)</td><td>Afficher et envoyer tes mails depuis Tempo</td></tr>
+            </tbody>
+        </table>
+        <p>
+            Ces informations sont enregistrées dans la base de données de ton compte.
+            Nous ne collectons aucune donnée de santé, de localisation ou de contacts.
+        </p>
+
+        <h2>3. Et mon emploi du temps et mes habitudes ?</h2>
+        <p>
+            Tes créneaux et tes habitudes quotidiennes sont enregistrés <strong>uniquement sur ton appareil</strong>
+            (dans le stockage local de ton navigateur). Ils ne sont pas envoyés à nos serveurs.
+            Conséquence : si tu vides les données de ton navigateur ou que tu changes d'appareil, tu ne les retrouveras pas.
+        </p>
+
+        <h2>4. Connexion à ta boîte Gmail (facultative)</h2>
+        <p>
+            Si tu le décides, tu peux connecter ta boîte Gmail depuis la page « Paramètres »
+            (réservé aux 15 ans et plus). Tempo demande alors deux autorisations à Google, que tu valides
+            sur l'écran de Google : <strong>lire tes mails</strong> et <strong>envoyer des mails en ton nom</strong>.
+            Tempo ne peut ni supprimer, ni modifier, ni archiver tes mails.
+        </p>
+        <ul>
+            <li>
+                <strong>Ce que Tempo fait :</strong> afficher ton nombre de mails non lus et tes derniers messages
+                (expéditeur, objet, extrait, date) ; afficher le contenu d'un mail uniquement quand tu l'ouvres ;
+                envoyer un mail uniquement quand tu cliques sur « Envoyer ».
+            </li>
+            <li>
+                <strong>Ce que Tempo conserve :</strong> l'adresse Gmail connectée, tes préférences d'affichage
+                et un jeton d'accès <strong>chiffré</strong>, stocké côté serveur chez Supabase.
+                Le <strong>contenu de tes mails n'est pas enregistré</strong> : il est lu à la demande, affiché, puis oublié.
+            </li>
+            <li>
+                <strong>Mail vers emploi du temps :</strong> si tu transformes un mail en créneau ou en habitude,
+                seuls l'objet du mail et le nom de l'expéditeur sont copiés, sur ton appareil uniquement.
+            </li>
+            <li>
+                Ces données ne sont ni vendues, ni utilisées pour de la publicité, ni pour entraîner des modèles d'intelligence artificielle.
+            </li>
+        </ul>
+        <p>
+            L'utilisation par Tempo des informations reçues des API Google respecte la
+            <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">politique de Google sur les données utilisateur des services d'API</a>,
+            y compris ses exigences d'<strong>utilisation limitée</strong> (Limited Use).
+        </p>
+        <p>
+            Tu peux couper l'accès à tout moment : bouton « Déconnecter » dans les Paramètres
+            (l'accès est révoqué chez Google et le jeton supprimé), ou depuis la page
+            <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">des accès de ton compte Google</a>.
+        </p>
+
+        <h2>5. Sur quelle base légale ?</h2>
+        <p>
+            Le traitement de ces données repose sur ton <strong>consentement</strong>, que tu donnes en cochant la case
+            lors de l'inscription (et, pour Gmail, par ton autorisation sur l'écran de Google), et sur la nécessité de te fournir le service auquel tu t'es inscrit(e).
+            Tu peux retirer ton consentement à tout moment (voir « Tes droits »).
+        </p>
+
+        <h2>6. Où sont stockées tes données ? Qui y a accès ?</h2>
+        <ul>
+            <li>
+                <strong>Supabase</strong> assure l'authentification et l'hébergement de la base de données.
+                Les données sont hébergées dans l'Union européenne
+                <mark class="todo">[À VÉRIFIER : région du projet Supabase dans le tableau de bord]</mark>.
+            </li>
+            <li>
+                <strong>Google (API Gmail)</strong>, uniquement si tu connectes ta boîte mail : il t'authentifie
+                et fournit l'accès à tes mails selon les autorisations que tu as données.
+            </li>
+            <li>
+                <strong>jsDelivr</strong> (réseau de diffusion de fichiers) fournit une bibliothèque technique à ton navigateur,
+                ce qui lui transmet nécessairement ton adresse IP.
+            </li>
+        </ul>
+        <p>
+            Tes données ne sont ni vendues, ni louées, ni utilisées pour de la publicité.
+            Tempo n'utilise ni cookies publicitaires ni outil de mesure d'audience.
+            Seul un jeton de connexion est conservé dans ton navigateur pour te garder connecté(e).
+        </p>
+
+        <h2>7. Combien de temps ?</h2>
+        <p>
+            Tes données de compte sont conservées tant que ton compte existe.
+            <mark class="todo">[À COMPLÉTER : durée de conservation après suppression ou inactivité]</mark>
+        </p>
+
+        <h2>8. Tes droits</h2>
+        <p>Conformément au RGPD, tu disposes des droits suivants :</p>
+        <ul>
+            <li><strong>Accès</strong> : savoir quelles données on détient sur toi ;</li>
+            <li><strong>Rectification</strong> : corriger des informations inexactes ;</li>
+            <li><strong>Effacement</strong> : demander la suppression de ton compte et de tes données ;</li>
+            <li><strong>Portabilité</strong> : récupérer tes données dans un format réutilisable ;</li>
+            <li><strong>Opposition et limitation</strong> du traitement ;</li>
+            <li><strong>Retrait du consentement</strong> à tout moment.</li>
+        </ul>
+        <p>
+            Pour exercer ces droits, écris à
+            <mark class="todo">[À COMPLÉTER : adresse email de contact]</mark>.
+            Si tu estimes que tes droits ne sont pas respectés, tu peux aussi saisir la
+            <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener">CNIL</a>.
+        </p>
+
+        <h2>9. Mineurs</h2>
+        <p>
+            Tempo est réservé aux personnes de <strong>10 ans et plus</strong>.
+            Entre 10 et 14 ans, l'accord d'un parent ou tuteur légal est obligatoire :
+            une confirmation est demandée lors de la complétion du profil. La connexion d'une boîte mail est réservée aux 15 ans et plus.
+            Un parent ou tuteur peut demander à tout moment l'accès, la correction ou la suppression des données de son enfant.
+        </p>
+
+        <h2>10. Sécurité et modifications</h2>
+        <p>
+            Les échanges avec le serveur sont chiffrés et les mots de passe sont protégés par le service d'authentification.
+            Si cette politique change de façon importante, la date de mise à jour ci-dessus sera modifiée.
+        </p>
+
+        <a class="back-link" href="index.html">← Retour à Tempo</a>
+    </main>
+
+</body>
+</html>

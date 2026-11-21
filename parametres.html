@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempo - Paramètres</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tempo">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/parametres.css">
+    <!-- SDK Officiel Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/shared.js" defer></script>
+    <script src="js/mail.js" defer></script>
+    <script src="js/parametres.js" defer></script>
+</head>
+<body class="settings-page pending">
+
+    <main class="settings-container">
+        <a class="back-link" href="accueil.html">← Retour à l'accueil</a>
+        <h1>Paramètres</h1>
+
+        <div id="settings-banner" class="banner hidden"></div>
+
+        <!-- CONNEXION GMAIL -->
+        <section class="settings-card">
+            <h2>📬 Boîte mail (Gmail)</h2>
+            <div id="mail-connection"><p class="muted">Chargement…</p></div>
+
+            <ul class="perm-list">
+                <li><strong>Lecture seule</strong> : Tempo affiche tes mails non lus et le contenu d'un mail quand tu l'ouvres.</li>
+                <li><strong>Envoi</strong> : Tempo envoie un mail en ton nom uniquement quand tu cliques sur « Envoyer ».</li>
+                <li>Tempo ne peut ni supprimer, ni modifier, ni archiver tes mails, et <strong>ne stocke pas leur contenu</strong>.</li>
+                <li>Tu peux retirer l'accès à tout moment ici, ou depuis ton compte Google.
+                    <a href="confidentialite.html" target="_blank" rel="noopener">En savoir plus</a>.</li>
+            </ul>
+        </section>
+
+        <!-- RÉGLAGES D'AFFICHAGE (visibles seulement si connecté) -->
+        <section class="settings-card hidden" id="mail-settings-card">
+            <h2>⚙ Affichage de la boîte mail</h2>
+            <form onsubmit="saveMailSettings(event)">
+                <div class="form-group">
+                    <label for="set-max">Nombre de mails affichés</label>
+                    <select id="set-max">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="set-refresh">Actualisation automatique</label>
+                    <select id="set-refresh">
+                        <option value="0">Jamais (bouton « Actualiser »)</option>
+                        <option value="2">Toutes les 2 minutes</option>
+                        <option value="5">Toutes les 5 minutes</option>
+                        <option value="10">Toutes les 10 minutes</option>
+                    </select>
+                </div>
+
+                <label class="check-row" for="set-unread">
+                    <input type="checkbox" id="set-unread">
+                    <span>Afficher uniquement les mails non lus</span>
+                </label>
+
+                <button type="submit" class="submit-btn" id="save-settings-btn">Enregistrer</button>
+            </form>
+        </section>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+/* Widget boîte mail de l'accueil (dépend de base.css + accueil.css) */
+
+.mail-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.mail-unread-badge {
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 8px;
+}
+
+.mail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mail-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+        "from date"
+        "subject subject"
+        "snippet snippet";
+    gap: 2px 12px;
+    text-align: left;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.mail-row:hover {
+    border-color: var(--text-muted);
+    background: var(--card-hover);
+}
+
+.mail-row.unread {
+    border-left: 3px solid var(--accent);
+    color: var(--text-color);
+}
+
+.mail-from { grid-area: from; font-size: 0.85rem; font-weight: 600; }
+.mail-date { grid-area: date; font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+.mail-subject { grid-area: subject; font-size: 0.85rem; }
+.mail-row.unread .mail-subject { font-weight: 600; }
+.mail-snippet { grid-area: snippet; font-size: 0.78rem; color: var(--text-muted); }
+
+.mail-from,
+.mail-subject,
+.mail-snippet {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.mail-empty,
+.mail-cta p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.mail-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* Fenêtres lecture / rédaction */
+.mail-modal-card {
+    max-width: 560px;
+}
+
+.mail-read-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: pre-line;
+    margin-bottom: 12px;
+}
+
+.mail-read-text {
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 45vh;
+    overflow-y: auto;
+}
+
+.mail-read-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+#compose-body {
+    width: 100%;
+    resize: vertical;
+    padding: 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-color);
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+#compose-body:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.mail-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 1px solid var(--success);
+    color: #6ee7b7;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    z-index: 200;
+}
