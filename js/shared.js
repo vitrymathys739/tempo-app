@@ -9,7 +9,7 @@ if ('serviceWorker' in navigator) {
 
 // ⚠️ REMPLACE TA PUBLISHABLE KEY CI-DESSOUS ⚠️
 const SUPABASE_URL = 'https://kgrgetlhsedhhjgjxonj.supabase.co';
-const SUPABASE_ANON_KEY = 'TA-PUBLISHABLE-KEY';
+const SUPABASE_ANON_KEY = 'sb_publishable_-mMY5b7LTRwzCE5ny1aMSw_8KEvUMCT';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
